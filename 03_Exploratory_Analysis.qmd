@@ -1,0 +1,153 @@
+---
+title: "Exploratory Analysis of Throne Speeches"
+author: "Doron Feingold"
+date: "August 20, 2025"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    self-contained: true
+    theme: cosmo
+    code-overflow: wrap
+
+
+---
+
+## Overview
+
+This document performs an initial exploratory data analysis (EDA) on the segmented corpus of Canadian Throne Speeches. The goal is to uncover broad patterns in the text data over time, focusing on word frequencies, repeated phrases (n-grams), and key terms that characterize different eras.
+
+---
+
+## 1. Setup 
+
+First, we load the required libraries for data manipulation, text analysis, and visualization. 
+
+```{r setup, message=FALSE, warning=FALSE}
+# Data Manipulation and Analysis
+library(dplyr)
+library(tidytext)
+library(stringr)
+library(textstem)
+library(tidyr)
+# Visualization
+library(ggplot2)
+library(scales)
+
+source("R/functions.R")
+```
+
+## 2. Data Loading
+We then load the segmented corpus and summary files created in the previous step.
+```{r data}
+# Load the pre-processed data from the segmentation step
+clean_corpus <- readr::read_csv(
+  "output/segmentation/llm_clean_segmented_corpus.csv"
+)
+speech_summaries <- readr::read_csv(
+  "output/segmentation/llm_speech_summaries.csv"
+)
+
+# Create a decade field for grouping
+speeches_df <- clean_corpus %>%
+  mutate(decade = paste0(floor(year / 10) * 10, "s"))
+
+custom_stop_words <- get_project_stopwords()
+
+analytical_corpus <- speeches_df %>%
+  # Unnest, clean, and lemmatize the words
+  unnest_tokens(word, policy_content) %>%
+  anti_join(custom_stop_words, by = "word") %>%
+  mutate(lemma = lemmatize_words(word)) %>%
+  mutate(
+    lemma = case_when(
+      lemma %in% c("canadian", "canada's") ~ "canada",
+      TRUE ~ lemma
+    )
+  ) %>%
+  # Re-assemble the cleaned text for each speech
+  group_by(filename, date, year, parliament, decade) %>%
+  summarise(
+    clean_policy_text = str_c(lemma, collapse = " "),
+    .groups = "drop"
+  )
+
+```
+
+## 3. Basic Text Statistics by Decade
+Let's start by looking at some high-level statistics to see how the speeches have changed over time. We can examine the number of speeches and their average length by decade. Here, we'll focus on the word count of the policy_content section, as this is the core of the speech. 
+
+**Note**: The first speech was given in 1867.
+
+```{r ,echo=FALSE}
+decade_summary <- speeches_df %>%
+  group_by(decade) %>%
+  summarise(
+    number_of_speeches = n(),
+    avg_policy_words = mean(policy_word_count, na.rm = TRUE)
+  ) %>%
+  arrange(decade)
+
+print(decade_summary)
+
+# Visualize the average length of the policy section over time
+decade_summary %>%
+  ggplot(aes(x = decade, y = avg_policy_words, group = 1)) +
+  geom_line(linewidth = 1.2, color = "royalblue") +
+  geom_point(size = 3, color = "royalblue") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Average Word Count of Policy Content in Throne Speeches",
+    subtitle = "A notable increase in length is visible in the post-war decades",
+    x = "Decade",
+    y = "Average Word Count"
+  )
+```
+
+This initial view shows how the substantive policy portion of the speeches has grown considerably over time, peaking in the mid-to-late 20th century.
+
+## 4. Word Frequency Analysis
+Now, let's identify the most common words used in the policy_content of the speeches. This helps us understand the core vocabulary.
+
+```{r ,echo=FALSE}
+top_words <- analytical_corpus %>%
+  unnest_tokens(lemma, clean_policy_text) %>%
+  count(lemma, sort = TRUE)
+
+print(head(top_words, 20))
+
+# Visualize the top 15 words
+top_words %>%
+  head(15) %>%
+  mutate(lemma = reorder(lemma, n)) %>% # Reorder for plotting
+  ggplot(aes(x = lemma, y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Top 15 Most Frequent Words in Policy Sections",
+    subtitle = "Excluding common stop words",
+    x = "Word",
+    y = "Frequency"
+  )
+```
+
+Words like "government," "canada," and "development" are, unsurprisingly, common, reflecting the nature of these speeches.
+
+## 4. N-gram Analysis
+Word frequencies are useful, but context is often lost. N-grams are sequences of N words, which help us find commonly repeated phrases. Let's look at bigrams (2-word phrases) to see what concepts often appear together.
+
+```{r ,echo=FALSE}
+bigram_counts <- analytical_corpus %>%
+  unnest_tokens(bigram, clean_policy_text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE)
+
+print(head(bigram_counts, 20))
+```
+
+Phrases like "house common" , "united states," and  "government work"   appear frequently, highlighting key entities and concepts in Canadian political discourse.
+
+**Note**: Lemmatization replaces words with their root form (e.g., “working” -> “work,” "governmental" -> "government"). This is why a phrase like “government work” appears frequently, as it captures many variations of the original phrasing.
+
+Next we identify boilerplate phrases by analyzing the ceremonial text.

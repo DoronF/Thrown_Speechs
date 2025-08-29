@@ -1,0 +1,339 @@
+---
+title: "Boilerplate Identification"
+author: "Doron Fingold"
+date: "August 20, 2025"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    self-contained: true
+    theme: cosmo
+    code-overflow: wrap
+    
+---
+
+## Overview
+
+This document implements Phase 2 of the Throne Speech Cultural Analysis Workflow: **Refined Boilerplate Identification**. The primary goal is to analyze the ceremonial sections of the speeches to create a "boilerplate dictionary". This dictionary will contain recurring, formal phrases that are structural rather than substantive.
+
+This process involves:  
+
+* Isolating the ceremonial text from the segmented corpus.  
+* Performing n-gram frequency analysis to find common phrases.   
+* Analyzing document frequency to find *pervasive* phrases that appear in most speeches.   
+* Compiling the results into a final dictionary.  
+
+----
+
+## 1. Setup and Data Preparation
+
+First, we load the necessary libraries and the clean, segmented corpus. We'll then create a dedicated corpus containing only the ceremonial text for our analysis.
+
+```{r setup, message=FALSE, warning=FALSE}
+set.seed(1867)
+
+# Load libraries
+library(dplyr)
+library(tidytext)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+
+source("R/functions.R")
+
+# Load the segmented corpus
+clean_corpus <- readr::read_csv(
+  "output/segmentation/llm_clean_segmented_corpus.csv"
+)
+
+ceremonial_corpus <- clean_corpus %>%
+  select(filename, year, opening_ceremonial, closing_ceremonial) %>%
+  mutate(ceremonial_text = paste(opening_ceremonial, closing_ceremonial))
+
+total_docs <- nrow(ceremonial_corpus)
+```
+
+## 1.1 Stopwords 
+Stopwords are commonly removed during text preprocessing because they appear frequently across documents but carry little semantic meaning that distinguishes one text from another - words like "the," "and," "is," and "of" typically don't contribute to understanding the core topics or sentiment of a document. The `get_project_stopwords` function combines a standard set of stopwords (`tidytext::get_stopwords()`), with custom ones that appear with high frequency in throne speeches but don't help us identify topics. 
+```{r stopwords, echo = FALSE}
+cat("Custom Stopwords: \n")
+print(custom_words$word)
+# stop word regex
+stopword_regex <- paste0(
+  "\\b",
+  get_project_stopwords()$word,
+  "\\b",
+  collapse = "|"
+)
+```
+
+## 2. A Unified Analysis of Phrase Proportionality
+
+To create a robust boilerplate dictionary, we will analyze n-grams from both ceremonial and policy texts simultaneously. We will identify phrases that are both highly pervasive across all speeches and disproportionately found in ceremonial sections. We do so using `analyze_ceremony_ngrams` function which takes in the size of the n-gram" (number of words), in our case 2 and 3, the corpora and the stopwords regex, we prepared at the beginning, and returns a summary dataset comparing n-gram usage. 
+The table below, shows the top 12 n-grams.
+
+
+```{r unified-multigram-analysis, cache=TRUE}
+
+#  Run the Analysis for N=2, 3
+all_ngrams_summary <- purrr::map_dfr(
+  c(2, 3),  # <- n-grams 2 and 3
+  analyze_ceremony_ngrams, # <- THIS IS WHERE THE FUNCTION IS CALLED
+  ceremonial_corpus, clean_corpus, stopword_regex # <- Other function arguments
+) %>%
+  select(
+    ngram,
+    n_size,
+    pervasiveness_pct,
+    ceremonial_proportion,
+    df_ceremonial,
+    df_policy
+  ) %>%
+  arrange(desc(pervasiveness_pct))
+
+knitr::kable(head(all_ngrams_summary, 12))
+```
+
+Visualizing the results, this plot makes the trade-off clear. We are looking for phrases in the top-right quadrant.
+
+```{r ,echo=FALSE}
+all_ngrams_summary %>%
+  filter(pervasiveness_pct > 10) %>% # Filter to reduce noise
+  ggplot(aes(x = pervasiveness_pct, y = ceremonial_proportion)) +
+  geom_point(alpha = 0.6, color = "darkslateblue") +
+  ggrepel::geom_text_repel(
+    aes(label = ngram),
+    data = . %>% filter(pervasiveness_pct > 50, ceremonial_proportion > 0.9)
+  ) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Identifying Boilerplate by Pervasiveness and Proportionality",
+    x = "Pervasiveness (% of all Speeches)",
+    y = "Ceremonial Proportionality Score (1.0 = Purely Ceremonial)"
+  )
+```
+
+## 3. Creating the Dictionary 
+With these thresholds clearly defined, creating the dictionary is a simple, justifiable filtering step.
+
+```{r create-intrusion-dictionary}
+# - Lower PERVASIVENESS_THRESHOLD to include rarer phrases.
+# - Lower PROPORTIONALITY_THRESHOLD to include phrases that are less purely ceremonial.
+PERVASIVENESS_THRESHOLD <- 10 # Lowered to 10% to catch more phrases
+PROPORTIONALITY_THRESHOLD <- 0.6 # At least 60% of its appearances must be ceremonial
+
+# Create the Dictionary
+intrusion_dictionary_df <- all_ngrams_summary %>%
+  filter(
+    pervasiveness_pct >= PERVASIVENESS_THRESHOLD,
+    ceremonial_proportion >= PROPORTIONALITY_THRESHOLD,
+    df_policy > 0
+  ) %>%
+  # Sort by n-gram size (longest first) to handle overlaps
+  arrange(desc(n_size))
+
+# add custom phrases that are obvious but may not be common enough in the ceremonial text
+custom_phrases_df <- tibble(
+  ngram = c(
+    "honourable gentlemen of the senate",
+    "gentlemen of the house of commons"
+  )
+) %>%
+  # Add the n_size column so we can sort correctly
+  mutate(n_size = str_count(ngram, "\\w+"))
+
+intrusion_dictionary_df <- bind_rows(
+  intrusion_dictionary_df,
+  custom_phrases_df
+) %>%
+  distinct(ngram, .keep_all = TRUE) %>%
+  # Sort by n-gram size (longest first) to handle overlaps
+  arrange(desc(n_size))
+
+# Create the final regex from the sorted ngram column
+intrusion_regex <- paste(intrusion_dictionary_df$ngram, collapse = "|")
+```
+```{r , echo = FALSE}
+cat(
+  "Final Intrusion Dictionary created with",
+  nrow(intrusion_dictionary_df),
+  "phrases.\n"
+)
+
+knitr::kable(head(intrusion_dictionary_df, 12))
+
+```
+
+## 4. Applying the Dictionary to Filter Policy Content
+
+Finally, we can demonstrate how to use this dictionary to filter these ceremonial phrases out of the policy_content section, as described in step 2.3 of the plan. This leaves a cleaner text for deeper thematic analysis later.
+
+```{r , echo=FALSE}
+# Take a sample speech to see the before-and-after
+sample_speech <- clean_corpus[sample(1:nrow(clean_corpus), 1), ]
+
+original_text <- sample_speech$policy_content
+# Use str_remove_all with our regex. We add `ignore_case = TRUE` for robustness.
+filtered_text <- str_remove_all(
+  original_text,
+  regex(intrusion_regex, ignore_case = TRUE)
+)
+
+# Show the difference
+cat(
+  "--- ORIGINAL TEXT (Excerpt) ---\n",
+  str_trunc(original_text, 300) %>% str_wrap(width = 80),
+  "\n\n--- FILTERED TEXT (Excerpt) ---\n",
+  str_trunc(filtered_text, 300) %>% str_wrap(width = 80),
+  "\n"
+)
+```
+
+
+```{r , echo=FALSE}
+impact_summary <- clean_corpus %>%
+  mutate(
+    # 1. Count words after removing stopwords
+    text_no_stopwords = str_remove_all(
+      policy_content,
+      regex(stopword_regex, ignore_case = TRUE)
+    ),
+    words_after_stopwords = str_count(text_no_stopwords, "\\w+"),
+
+    # Count words after removing BOTH stopwords and intrusion phrases
+    text_no_both = str_remove_all(
+      text_no_stopwords,
+      regex(intrusion_regex, ignore_case = TRUE)
+    ),
+    words_after_both = str_count(text_no_both, "\\w+"),
+
+    # Calculate the number of words REMOVED at each stage
+    stopwords_removed = policy_word_count - words_after_stopwords,
+    boilerplate_removed = words_after_stopwords - words_after_both
+  ) %>%
+  # Create a decade column for grouping
+  mutate(decade = paste0(floor(year / 10) * 10, "s")) %>%
+  select(
+    decade,
+    total_words = policy_word_count,
+    stopwords_removed,
+    boilerplate_removed,
+    substantive_words = words_after_both
+  )
+
+# Calculate the average counts and percentages for each decade
+decade_impact_summary <- impact_summary %>%
+  group_by(decade) %>%
+  summarise(across(everything(), ~ mean(.x, na.rm = TRUE))) %>%
+  mutate(
+    `Stopwords Removed (%)` = (stopwords_removed / total_words) * 100,
+    `Boilerplate Removed (%)` = (boilerplate_removed / total_words) * 100,
+    `Substantive Words (%)` = (substantive_words / total_words) * 100
+  ) %>%
+  # Select and rename columns for the final table
+  select(
+    Decade = decade,
+    `Avg. Total Words` = total_words,
+    `Stopwords Removed` = stopwords_removed,
+    `Stopwords Removed (%)`,
+    `Boilerplate Removed` = boilerplate_removed,
+    `Boilerplate Removed (%)`,
+    `Substantive Words` = substantive_words,
+    `Substantive Words (%)`
+  )
+
+knitr::kable(
+  decade_impact_summary,
+  digits = 1,
+  caption = "Breakdown of Average Word Counts After Cleaning Steps by Decade"
+)
+```
+
+We observe that the *Substantive Words (%)* is about the same over the decades, ranging from 41.6 to 49.5. We can interpret this as an indication that our boilerplate + stopwords filter is general enough to have a similar impact. We might attribute the slight increase in Substantive words overtime as a function of the overall speech content increases over time.
+
+```{r , echo = FALSE}
+# Calculate a scaling factor to plot both metrics on the same chart
+# This maps the percentage values to the same range as the word counts
+max_words <- max(decade_impact_summary$`Avg. Total Words`, na.rm = TRUE)
+max_pct <- max(decade_impact_summary$`Substantive Words (%)`, na.rm = TRUE)
+scaling_factor <- max_words / max_pct
+
+# Create the dual-axis plot
+ggplot(decade_impact_summary, aes(x = Decade, group = 1)) +
+  # Bar chart for the average total words (left axis)
+  geom_col(
+    aes(y = `Avg. Total Words`),
+    fill = "skyblue",
+    alpha = 0.7,
+    color = "darkgrey"
+  ) +
+  # Line chart for the percentage of substantive words (right axis)
+  geom_line(
+    aes(y = `Substantive Words (%)` * scaling_factor),
+    color = "darkred",
+    linewidth = 1.5
+  ) +
+  geom_point(
+    aes(y = `Substantive Words (%)` * scaling_factor),
+    color = "darkred",
+    size = 3
+  ) +
+  # Define the primary and secondary y-axes
+  scale_y_continuous(
+    # Primary axis (for the bars)
+    name = "Average Total Words (Bars)",
+    # Secondary axis (for the line)
+    sec.axis = sec_axis(
+      ~ . / scaling_factor,
+      name = "Substantive Words (%) (Line)"
+    )
+  ) +
+  labs(
+    title = "Speech Length vs. Proportion of Substantive Words by Decade",
+    subtitle = "While speech length varies, the substantive proportion remains stable.",
+    x = "Decade",
+    y = "Average Total Words (Bars)"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## 5. Save Intrusion Dictionary & Regex
+* Saving `intrusion_dictionary.csv`, dictionary phrases as a CSV for easy inspection.
+* Saving `intrusion_regex.rds`, regex string as an RDS file for efficient use in R.
+
+```{r}
+output_dir <- "output/boilerplate/"
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE)
+}
+readr::write_csv(
+  intrusion_dictionary_df,
+  file.path(output_dir, "intrusion_dictionary.csv")
+)
+saveRDS(
+  intrusion_regex,
+  file = file.path(output_dir, "intrusion_regex.rds")
+)
+```
+
+
+## 6. Conclusion 
+
+The dictionary successfully removes the target phrases, demonstrating its utility for future analysis phases where we need to isolate purely policy-related text. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

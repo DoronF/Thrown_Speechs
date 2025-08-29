@@ -1,0 +1,18 @@
+# --- IDE Specific Files ---
+# RStudio
+.Rproj.user
+# Positron / VS Code
+.positron/
+.vscode/
+
+/.quarto/
+
+# --- R & RStudio specific files ---
+.Rhistory
+.RData
+.Renviron # IMPORTANT: Never commit your API keys or other secrets
+
+# --- Generated Data Directories ---
+# Ignore the entire directories where scripts save their output
+output/
+data/

@@ -1,0 +1,258 @@
+---
+title: "Topic Shift Analysis"
+author: "Doron Feingold"
+date: "today"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    self-contained: true
+    theme: cosmo
+    code-overflow: wrap
+---
+
+## Overview
+Now that we have labels for out topic we can plot the topic shift and review stattistics that might help us understand trends accross the different models.
+
+These metrics describe the behavior and nature of each topic over time.
+
+#### Topic Volatility
+*How "spiky" or "stable" is a topic's prominence over time?*
+For each topic, calculate the standard deviation or coefficient of variation of its average gamma scores across all speeches.
+**Interpretation:** A high volatility score indicates an "event-driven" topic that appears intensely and then fades (e.g., war, pandemic). A low score suggests a stable, persistent "background" topic that is always present.
+
+#### Topic Persistence
+*Does a topic remain relevant long after its peak, or does it disappear completely?*
+For each topic, calculate a "persistence score" by dividing its average gamma in the most recent year by its all-time peak gamma.
+**Interpretation**: A score close to 1 means the topic is still highly relevant today, even if its peak was long ago. A score close to 0 means the topic has largely faded from the discourse.
+
+#### Topic Exclusivity
+*How unique are the words that define a topic?*
+For each topic, count how many of its top 15 words are not in the top 15 words of any other topic in the same model.
+
+Interpretation: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.
+
+```{r setup, message=FALSE, warning=FALSE, echo = FALSE}
+# Load libraries
+library(dplyr)
+library(tidytext)
+library(tidyr)
+library(stringr)
+library(ggplot2)
+library(topicmodels)
+library(purrr)
+library(httr2)
+library(jsonlite)
+library(readr)
+library(kableExtra)
+
+# Load project-specific functions
+source("R/functions.R")
+
+# Load trained models, metadata, AND the LLM labels
+lda_models <- readRDS("output/models/lda_models.rds")
+llm_topic_labels <- readRDS("output/models/llm_topic_labels.rds")
+k_values <- c(4, 6, 8, 10, 12)
+
+# Load the segmented corpus
+clean_corpus <- readr::read_csv(
+  "output/segmentation/llm_clean_segmented_corpus.csv"
+)
+
+```
+
+
+```{r generate-all-analyses-mixed, echo=FALSE, warning=FALSE, message=FALSE}
+llm_topic_labels <- readRDS("output/models/llm_topic_labels.rds")
+
+analysis_results <- purrr::map2(lda_models, k_values, function(model, k) {
+  # --- 1. Create DECADE-LEVEL data for the PLOT ---
+  plot_data <- tidy(model, matrix = "gamma") %>%
+    left_join(
+      clean_corpus %>% select(filename, decade),
+      by = c("document" = "filename")
+    ) %>%
+    group_by(decade, topic) %>%
+    summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
+    mutate(topic = as.character(topic)) %>%
+    left_join(
+      llm_topic_labels %>%
+        filter(k == !!k) %>%
+        mutate(topic = as.character(topic)),
+      by = "topic"
+    )
+
+  if (nrow(plot_data) == 0) {
+    return(NULL)
+  }
+
+  # --- 2. Create the DECADE-LEVEL plot ---
+  main_plot <- ggplot(
+    plot_data,
+    aes(x = decade, y = avg_gamma, group = label, color = label)
+  ) +
+    geom_line(linewidth = 1.2, alpha = 0.8) +
+    theme_minimal(base_size = 14) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "none"
+    ) +
+    labs(
+      title = paste("Prominence of Policy Themes (k =", k, "Model)"),
+      subtitle = "Topic themes and their peak prominence over time",
+      x = "Decade",
+      y = "Average Topic Prominence (Gamma)"
+    )
+
+  g <- ggplot_build(main_plot)
+  color_map <- g$data[[1]] %>%
+    distinct(group, colour) %>%
+    mutate(label = sort(unique(plot_data$label))) %>%
+    select(label, colour) %>%
+    tibble::deframe()
+
+  start_year <- 1867
+
+  # --- 3. NEW: Create YEARLY-LEVEL data for the STATS table ---
+  yearly_data <- tidy(model, matrix = "gamma") %>%
+    left_join(
+      clean_corpus %>% select(filename, year),
+      by = c("document" = "filename")
+    ) %>%
+    group_by(year, topic) %>%
+    summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
+    mutate(topic = as.character(topic)) %>%
+    left_join(
+      llm_topic_labels %>%
+        filter(k == !!k) %>%
+        mutate(topic = as.character(topic)),
+      by = "topic"
+    )
+
+  # --- 4. Calculate Advanced Statistics using YEARLY data ---
+  volatility_data <- yearly_data %>%
+    group_by(Topic = label) %>%
+    summarise(volatility = sd(avg_gamma), .groups = "drop")
+
+  persistence_data <- yearly_data %>%
+    group_by(Topic = label) %>%
+    summarise(
+      peak_gamma = max(avg_gamma),
+      latest_gamma = first(avg_gamma, order_by = desc(year)),
+      .groups = "drop"
+    ) %>%
+    mutate(persistence = latest_gamma / peak_gamma) %>%
+    select(Topic, persistence)
+
+  all_top_terms <- tidy(model, matrix = "beta") %>%
+    group_by(topic) %>%
+    slice_max(beta, n = 25) %>%
+    ungroup()
+  unique_term_counts <- all_top_terms %>% count(term) %>% filter(n == 1)
+  exclusivity_data <- all_top_terms %>%
+    filter(term %in% unique_term_counts$term) %>%
+    count(topic, name = "exclusivity") %>%
+    mutate(topic = as.character(topic)) %>%
+    left_join(distinct(yearly_data, Topic = label, topic), by = "topic") %>%
+    select(Topic, exclusivity)
+
+  # --- 5. Combine All YEARLY Metrics into the Stats Table ---
+  sorted_peaks <- yearly_data %>%
+    group_by(label) %>%
+    slice_max(order_by = avg_gamma, n = 1, with_ties = FALSE) %>%
+    ungroup() %>%
+    select(Topic = label, `Peak Year` = year) %>%
+    arrange(`Peak Year`) %>%
+    left_join(volatility_data, by = "Topic") %>%
+    left_join(persistence_data, by = "Topic") %>%
+    left_join(exclusivity_data, by = "Topic")
+
+  peak_years <- sorted_peaks$`Peak Year`
+  gaps <- c(max(0, peak_years[1] - start_year))
+  if (length(peak_years) > 1) {
+    for (i in 2:length(peak_years)) {
+      gaps[i] <- peak_years[i] - peak_years[i - 1]
+    }
+  }
+
+  stats_table_data <- sorted_peaks %>% mutate(`Years Between Peaks` = gaps)
+
+  stats_table <- stats_table_data %>%
+    mutate(
+      Color = cell_spec("", "html", background = color_map[Topic]),
+      .before = 1
+    ) %>%
+    kbl(
+      escape = FALSE,
+      caption = "Topic Statistics and Cadence (Yearly)",
+      col.names = c(
+        "",
+        "Topic",
+        "Peak Year",
+        "Volatility",
+        "Persistence",
+        "Exclusivity",
+        "Years Between Peaks"
+      ),
+      digits = 2
+    ) %>%
+    kable_styling(
+      bootstrap_options = "condensed",
+      full_width = FALSE,
+      position = "left"
+    ) %>%
+    column_spec(1, width = "30px") %>%
+    column_spec(2, width = "18em")
+
+  list(
+    stats_table = stats_table,
+    main_plot = main_plot
+  )
+})
+
+names(analysis_results) <- paste0("k_", k_values)
+```
+
+## 4 Topics
+
+
+
+```{r display-k4, results='asis', echo=FALSE}
+# Explicitly print each object
+print(analysis_results$k_4$stats_table)
+print(analysis_results$k_4$main_plot)
+```
+
+## 6 Topics
+
+```{r display-k6, results='asis', echo=FALSE}
+# Explicitly print each object
+print(analysis_results$k_6$stats_table)
+print(analysis_results$k_6$main_plot)
+```
+
+## 8 Topics
+
+```{r display-k8, results='asis', echo=FALSE}
+# Explicitly print each object
+print(analysis_results$k_8$stats_table)
+print(analysis_results$k_8$main_plot)
+```
+
+## 10 Topics
+
+```{r display-k10, results='asis', echo=FALSE}
+# Explicitly print each object
+print(analysis_results$k_10$stats_table)
+print(analysis_results$k_10$main_plot)
+```
+
+## 12 Topics
+
+```{r display-k12, results='asis', echo=FALSE}
+# Explicitly print each object
+print(analysis_results$k_12$stats_table)
+print(analysis_results$k_12$main_plot)
+```
+
+

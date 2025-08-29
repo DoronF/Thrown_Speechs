@@ -1,0 +1,217 @@
+---
+title: "Automated Segmentation of Throne Speeches using the Gemini LLM"
+author: "Doron Feingold"
+date: "today"
+format: 
+  html:
+    toc: true
+    toc-location: left
+    self-contained: true
+    theme: cosmo
+    code-overflow: wrap
+
+---
+
+## Overview
+
+In the previous step, we scraped the Throne Speeches and saved them as text files. In this step we will segment the text. Manually dividing these speeches into their distinct rhetorical sections—the formal opening, the substantive policy agenda, and the ceremonial closing—is a time-consuming and subjective task. We will use Gemini LLM again to streamline the process.
+
+> **"Trust but verify"**
+
+LLMs are very good but not perfect, so we will break the process into 2 stages: 
+
+- **LLM Segmentation**: This stage automates the process by leveraging a Large Language Model (LLM), specifically Google's Gemini 1.5 Flash, via its API. The script loads a collection of speeches from text files, preprocesses them into a format the AI can understand, and then iteratively calls the Gemini API to identify the boundaries of each section. The final output is a set of structured CSV files, creating a clean, segmented corpus ready for analysis.
+
+- **Interactive Review**: The first stage identifies potential issue such as, "Low policy content", "Excessive opening", "High unclassified content", etc. The interactive review lets us review the flagged speeches and make corrections by re-classifying sentences as needed.
+
+***
+
+## Part 1: Setup and Configuration
+
+
+### 1.1: Loading Libraries
+```{r setup, message=FALSE, warning=FALSE}
+# Required Libraries
+library(dplyr) # Data manipulation
+#library(tidytext) # Text preprocessing and tokenization
+library(httr2) # For API requests
+library(jsonlite) # For JSON handling
+library(readr) # For reading/writing CSV
+library(purrr) # For functional programming
+library(stringr) # For string operations
+library(crayon) # colouring Interactive Console
+```
+
+### 1.2: Config
+Loading functions and setting up environment variables.
+
+```{r config}
+source("R/functions.R")
+
+GEMINI_API_KEY <- Sys.getenv("GEMINI_API_KEY")
+
+log_file <- "segmentation_log.txt"
+log_message("Starting throne speech segmentation script", log_file)
+
+output_dir <- "output/segmentation/"
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir, recursive = TRUE)
+}
+```
+
+## Part 2: Data Loading and Preprocessing
+The analysis begins by loading the raw text of the speeches and transforming it into a structured format suitable for the LLM. 
+
+**Note**: All functions are in `R/functions.R`
+
+### 2.1: Loading Speech Files
+`load_all_speeches` scans the throne_speeches_txt directory for all .txt files. For each file, it reads the content and extracts metadata (like Date: and Parliament:). It then compiles this into a single data frame, with one row per speech.
+
+### 2.2: Tokenizing Speeches into Sentences
+`tokenize_speeches`: Once loaded, the raw text of each speech is tokenized into individual sentences using `tidytext::unnest_tokens`. Each sentence is then numbered, creating a "numbered list" format that we will provide to the AI for easy reference. This step produces two key data frames: one with every sentence as a row, and another that collapses the numbered sentences back into a single text block for each speech.
+
+## Part 3: Interacting with the Gemini API
+`process_speech_with_gemini` is the core of this stage, where we communicate with the Gemini LLM the following prompt:
+
+```{txt}
+"Segment this full throne speech into three sections:
+1. OPENING_CEREMONIAL: Formal protocol, addresses, historical acknowledgments, and introductory remarks (typically the first few paragraphs).
+2. POLICY_CONTENT: Specific government agendas, commitments, and policy details (the bulk, often starting with phrases like "Our Government will..." or "My Government will...").
+3. CLOSING_CEREMONIAL: Formal conclusion, blessings, or prorogation notes (typically the last paragraph).
+Provide the output as a JSON object with keys:
+  - sections: An object with keys 'opening_ceremonial', 'policy_content', 'closing_ceremonial', each containing:
+  - start_sentence_id: Integer (1-based)
+  - end_sentence_id: Integer (1-based)
+  - transition_markers: Array of strings (any identified transition phrases, e.g., "Honourable Senators", "My Government will", "May Divine Providence")
+
+Ensure the output is ONLY a single, valid JSON object with no extra text or formatting.
+Full speech text with numbered sentences:
+    [...the numbered text is pasted here...]
+
+```
+
+
+
+
+### 3.2: The Main Processing Loop
+The `segment_speeches_llm` function orchestrates the entire segmentation process. It iterates through each speech, calling `process_speech_with_gemini` for each one.
+
+
+### 3.3: Compiling Results and Generating Outputs
+After the API calls are complete, the script's final phase is to transform the raw JSON responses from the AI into the final, usable CSV files. `compile_segmented_data` takes the list of results returned by the API and joins it back to our sentence-by-sentence data frame. It uses the start_sentence_id and end_sentence_id provided by the AI for each section to label every sentence with its corresponding category (opening_ceremonial, policy_content, etc.).
+
+### 3.4: Generating Final Output Files
+The `generate_outputs` function creates the final deliverables. It aggregates the sentence-level data to produce several summary tables: a clean corpus with one row per speech, a high-level summary of section proportions, and a list of speeches flagged for potential review.
+
+### 3.5: Execution
+This is the main execution block that runs the entire process from start to finish. The functions defined in the previous steps are called in logical order.
+
+**Note**: This code chunk is set to `eval=FALSE` by default to prevent it from automatically running when you render the document.
+
+```{r run-analysis, eval=FALSE}
+# Main Execution
+main <- function(base_dir = "output/throne_speeches_txt", api_key) {
+  log_message("=== Starting Main Execution ===", log_file)
+
+  # Step 1: Load speeches
+  speeches_df <- load_all_speeches(base_dir, log_file)
+
+  # Step 2: Tokenize and prepare numbered text
+  tokenized <- tokenize_speeches(speeches_df, log_file)
+  speeches_sentences <- tokenized$sentences
+  speeches_numbered <- tokenized$numbered
+
+  # Step 3: Process with Gemini API
+  segmented_list <- segment_speeches_llm(
+    speeches_numbered,
+    api_key,
+    log_file = log_file
+  )
+
+  # Step 4: Compile segmented data
+  segmented_data <- compile_segmented_data(
+    speeches_sentences,
+    segmented_list,
+    log_file
+  )
+
+  # Step 5: Generate outputs
+  outputs <- generate_segmented_outputs(segmented_data, log_file)
+
+  # Save results
+  log_message("Saving output files", log_file)
+  write_csv(segmented_data, "output/segmentation/llm_detailed_segmentation.csv")
+  write_csv(
+    outputs$corpus,
+    "output/segmentation/llm_clean_segmented_corpus.csv"
+  )
+  write_csv(outputs$summaries, "output/segmentation/llm_speech_summaries.csv")
+  write_csv(outputs$validation, "output/segmentation/llm_validation_stats.csv")
+  write_csv(outputs$issues, "output/segmentation/llm_issues.csv")
+
+  # Print summaries
+  cat("\n=== FINAL CORPUS SUMMARY ===\n")
+  print(
+    outputs$summaries %>%
+      select(
+        filename,
+        year,
+        opening_pct,
+        policy_pct,
+        closing_pct,
+        unclassified_pct
+      ) %>%
+      head()
+  )
+
+  cat("\n=== VALIDATION BY ERA ===\n")
+  print(outputs$validation)
+
+  cat("\n=== SPEECHES FLAGGED FOR REVIEW ===\n")
+  cat(
+    "Number flagged:",
+    nrow(outputs$issues),
+    "out of",
+    nrow(outputs$summaries),
+    "speeches\n"
+  )
+  if (nrow(outputs$issues) > 0) {
+    print(outputs$issues %>% select(filename, year, issue))
+  }
+
+  log_message("=== Script Execution Completed ===", log_file)
+  return(list(
+    segmented_data = segmented_data,
+    outputs = outputs
+  ))
+}
+
+results <- main(
+  base_dir = "output/throne_speeches_txt",
+  api_key = GEMINI_API_KEY
+)
+```
+
+***
+
+## 4. Interactive Review of Identified Issues
+An interactive tool to review and correct LLM-based speech segmentations. The script loops through the speeches identified and recorded in llm_issues.csv. The screenshot below illustrates the options available.
+
+
+![Screenshot of the main menu for the interactive console review script below](data/Segmentation_Prompt.png)
+
+**Note**: The script below will only run on R console (most IDEs should be fine. I used Positron with no issues).
+
+```{r , eval=FALSE}
+
+source("R/interactive_segmentation_review.R")
+
+```
+
+## Conclusion 
+
+In this step, we segmented the sentences using a two-stage approach where we ask an LLM to segment our text. We used logical thresholds to identify issues for review. Reviewed and made corrections. 
+ 
+
+In the next step we will explore the data.
+
