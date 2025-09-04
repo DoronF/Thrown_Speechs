@@ -1,11 +1,11 @@
 ---
-title: "Automated Segmentation of Throne Speeches using the Gemini LLM"
+title: "Segmentation of Throne Speeches using Gemini LLM"
 author: "Doron Feingold"
 date: "today"
 format: 
   html:
     toc: true
-    toc-location: left
+    toc-location: right
     self-contained: true
     theme: cosmo
     code-overflow: wrap
@@ -16,8 +16,6 @@ format:
 
 In the previous step, we scraped the Throne Speeches and saved them as text files. In this step we will segment the text. Manually dividing these speeches into their distinct rhetorical sections—the formal opening, the substantive policy agenda, and the ceremonial closing—is a time-consuming and subjective task. We will use Gemini LLM again to streamline the process.
 
-> **"Trust but verify"**
-
 LLMs are very good but not perfect, so we will break the process into 2 stages: 
 
 - **LLM Segmentation**: This stage automates the process by leveraging a Large Language Model (LLM), specifically Google's Gemini 1.5 Flash, via its API. The script loads a collection of speeches from text files, preprocesses them into a format the AI can understand, and then iteratively calls the Gemini API to identify the boundaries of each section. The final output is a set of structured CSV files, creating a clean, segmented corpus ready for analysis.
@@ -26,14 +24,14 @@ LLMs are very good but not perfect, so we will break the process into 2 stages:
 
 ***
 
-## Part 1: Setup and Configuration
+## Setup and Configuration
 
 
-### 1.1: Loading Libraries
+### Loading Libraries
 ```{r setup, message=FALSE, warning=FALSE}
 # Required Libraries
 library(dplyr) # Data manipulation
-#library(tidytext) # Text preprocessing and tokenization
+library(tidytext) # Text preprocessing and tokenization
 library(httr2) # For API requests
 library(jsonlite) # For JSON handling
 library(readr) # For reading/writing CSV
@@ -42,7 +40,6 @@ library(stringr) # For string operations
 library(crayon) # colouring Interactive Console
 ```
 
-### 1.2: Config
 Loading functions and setting up environment variables.
 
 ```{r config}
@@ -59,21 +56,77 @@ if (!dir.exists(output_dir)) {
 }
 ```
 
-## Part 2: Data Loading and Preprocessing
+## Data Loading and Preprocessing
 The analysis begins by loading the raw text of the speeches and transforming it into a structured format suitable for the LLM. 
 
-**Note**: All functions are in `R/functions.R`
+**Note**: Some functions are in `R/functions.R`
 
-### 2.1: Loading Speech Files
+### Loading Speech Files
 `load_all_speeches` scans the throne_speeches_txt directory for all .txt files. For each file, it reads the content and extracts metadata (like Date: and Parliament:). It then compiles this into a single data frame, with one row per speech.
 
-### 2.2: Tokenizing Speeches into Sentences
+### Tokenizing Speeches into Sentences
 `tokenize_speeches`: Once loaded, the raw text of each speech is tokenized into individual sentences using `tidytext::unnest_tokens`. Each sentence is then numbered, creating a "numbered list" format that we will provide to the AI for easy reference. This step produces two key data frames: one with every sentence as a row, and another that collapses the numbered sentences back into a single text block for each speech.
 
-## Part 3: Interacting with the Gemini API
+```{r tokenize_speeches}
+# Function to Clean and Tokenize Speeches into Sentences
+tokenize_speeches <- function(speeches_df, log_file) {
+  log_message("Starting tokenization of speeches", log_file)
+  speeches_sentences <- speeches_df %>%
+    mutate(
+      clean_text = str_replace_all(
+        speech_text,
+        "[\u201C\u201D\u2018\u2019\u201A\u201E\u2026\u2013\u2014]",
+        "'"
+      ) %>%
+        str_replace_all("\\s+", " ") %>%
+        str_trim()
+    ) %>%
+    unnest_tokens(
+      sentence,
+      clean_text,
+      token = "sentences",
+      to_lower = FALSE
+    ) %>%
+    filter(str_length(sentence) > 10) %>%
+    group_by(filename) %>%
+    mutate(
+      sentence_id = row_number(),
+      sentence_position = sentence_id / max(sentence_id),
+      numbered_text = paste(sentence_id, sentence, sep = ": ")
+    ) %>%
+    ungroup()
+
+  speeches_numbered <- speeches_sentences %>%
+    group_by(filename, date, year, parliament, text_length) %>%
+    summarise(
+      full_numbered_text = paste(numbered_text, collapse = "\n"),
+      total_sentences = n(),
+      .groups = "drop"
+    )
+
+  log_message(
+    paste(
+      "Tokenized",
+      nrow(speeches_numbered),
+      "speeches into",
+      sum(speeches_numbered$total_sentences),
+      "sentences"
+    ),
+    log_file
+  )
+  write_csv(
+    speeches_sentences,
+    "output/segmentation/intermediate_sentences.csv"
+  )
+  write_csv(speeches_numbered, "output/segmentation/intermediate_numbered.csv")
+  return(list(sentences = speeches_sentences, numbered = speeches_numbered))
+}
+```
+
+## Interacting with the Gemini API
 `process_speech_with_gemini` is the core of this stage, where we communicate with the Gemini LLM the following prompt:
 
-```{txt}
+```{txt prompt, code_folding="none"}
 "Segment this full throne speech into three sections:
 1. OPENING_CEREMONIAL: Formal protocol, addresses, historical acknowledgments, and introductory remarks (typically the first few paragraphs).
 2. POLICY_CONTENT: Specific government agendas, commitments, and policy details (the bulk, often starting with phrases like "Our Government will..." or "My Government will...").
@@ -85,23 +138,288 @@ Provide the output as a JSON object with keys:
   - transition_markers: Array of strings (any identified transition phrases, e.g., "Honourable Senators", "My Government will", "May Divine Providence")
 
 Ensure the output is ONLY a single, valid JSON object with no extra text or formatting.
-Full speech text with numbered sentences:
-    [...the numbered text is pasted here...]
-
 ```
 
 
-
-
-### 3.2: The Main Processing Loop
+### The Main Processing Loop
 The `segment_speeches_llm` function orchestrates the entire segmentation process. It iterates through each speech, calling `process_speech_with_gemini` for each one.
 
+```{r segment_speeches_llm}
 
-### 3.3: Compiling Results and Generating Outputs
+segment_speeches_llm <- function(
+  speeches_numbered,
+  api_key,
+  max_retries = 3,
+  sleep_time = 2,
+  log_file
+) {
+  log_message("Starting LLM segmentation", log_file)
+  # Load existing segmented results if available
+  segmented_list <- if (
+    file.exists("throne_speeches/intermediate_segmented_list.rds")
+  ) {
+    readRDS("throne_speeches/intermediate_segmented_list.rds")
+  } else {
+    list()
+  }
+  failed_speeches <- data.frame(filename = character(), error = character())
+
+  # Filter unprocessed speeches
+  speeches_to_process <- speeches_numbered %>%
+    filter(!filename %in% names(segmented_list))
+  log_message(
+    paste(
+      "Processing",
+      nrow(speeches_to_process),
+      "unprocessed speeches"
+    ),
+    log_file
+  )
+
+  for (i in 1:nrow(speeches_to_process)) {
+    row <- speeches_to_process[i, ]
+    attempt <- 1
+    result <- NULL
+
+    while (is.null(result) && attempt <= max_retries) {
+      log_message(paste("Attempt", attempt, "for", row$filename), log_file)
+      result <- process_speech_with_gemini(
+        row$full_numbered_text,
+        row$filename,
+        api_key,
+        log_file = log_file
+      )
+      if (is.null(result)) {
+        log_message(
+          paste(
+            "Retrying",
+            row$filename,
+            "after",
+            sleep_time,
+            "seconds"
+          ),
+          log_file
+        )
+        Sys.sleep(sleep_time)
+        attempt <- attempt + 1
+      }
+    }
+
+    if (is.null(result)) {
+      failed_speeches <- rbind(
+        failed_speeches,
+        data.frame(filename = row$filename, error = "Failed after max retries")
+      )
+    }
+    segmented_list[[row$filename]] <- result
+
+    if (i %% 10 == 0) {
+      log_message(
+        paste(
+          "...processed",
+          i,
+          "of",
+          nrow(speeches_to_process),
+          "speeches..."
+        ),
+        log_file
+      )
+    }
+  }
+
+  log_message(
+    paste(
+      "Completed LLM segmentation for",
+      length(segmented_list),
+      "speeches"
+    ),
+    log_file
+  )
+  write_csv(failed_speeches, "output/segmentation/failed_speeches.csv")
+  saveRDS(segmented_list, "output/segmentation/intermediate_segmented_list.rds")
+  return(segmented_list)
+}
+
+```
+
+### Compiling Results and Generating Outputs
 After the API calls are complete, the script's final phase is to transform the raw JSON responses from the AI into the final, usable CSV files. `compile_segmented_data` takes the list of results returned by the API and joins it back to our sentence-by-sentence data frame. It uses the start_sentence_id and end_sentence_id provided by the AI for each section to label every sentence with its corresponding category (opening_ceremonial, policy_content, etc.).
 
-### 3.4: Generating Final Output Files
-The `generate_outputs` function creates the final deliverables. It aggregates the sentence-level data to produce several summary tables: a clean corpus with one row per speech, a high-level summary of section proportions, and a list of speeches flagged for potential review.
+```{r compile_segmented_data}
+
+# Compile Segmented Data into Sentence-Level Dataframe
+compile_segmented_data <- function(
+  speeches_sentences,
+  segmented_list,
+  log_file
+) {
+  log_message("Compiling segmented data", log_file)
+  segmented_data <- speeches_sentences %>%
+    rowwise() %>%
+    mutate(
+      llm_result = list(segmented_list[[filename]]),
+      opening_start = llm_result$sections$opening_ceremonial$start_sentence_id %||%
+        NA,
+      opening_end = llm_result$sections$opening_ceremonial$end_sentence_id %||%
+        NA,
+      policy_start = llm_result$sections$policy_content$start_sentence_id %||%
+        NA,
+      policy_end = llm_result$sections$policy_content$end_sentence_id %||% NA,
+      closing_start = llm_result$sections$closing_ceremonial$start_sentence_id %||%
+        NA,
+      closing_end = llm_result$sections$closing_ceremonial$end_sentence_id %||%
+        NA,
+      section = case_when(
+        is.na(opening_start) | is.na(policy_start) | is.na(closing_start) ~
+          "unclassified",
+        between(sentence_id, opening_start, opening_end) ~ "opening_ceremonial",
+        between(sentence_id, policy_start, policy_end) ~ "policy_content",
+        between(sentence_id, closing_start, closing_end) ~ "closing_ceremonial",
+        TRUE ~ "unclassified"
+      )
+    ) %>%
+    ungroup()
+
+  log_message("Completed compilation of segmented data", log_file)
+  return(segmented_data)
+}
+
+```
+
+### Generating Final Output Files
+The `generate_segmented_outputs` function creates the final deliverables. It aggregates the sentence-level data to produce several summary tables: a clean corpus with one row per speech, a high-level summary of section proportions, and a list of speeches flagged for potential review.
+
+```{r generate_segmented_outputs}
+
+generate_segmented_outputs <- function(segmented_data, log_file) {
+  log_message(
+    "Generating outputs: summaries, corpus, validation, and issues",
+    log_file
+  )
+
+  # Speech Summaries
+  speech_summaries <- segmented_data %>%
+    group_by(filename, date, year, parliament) %>%
+    summarise(
+      total_sentences = n(),
+      opening_sentences = sum(section == "opening_ceremonial"),
+      policy_sentences = sum(section == "policy_content"),
+      closing_sentences = sum(section == "closing_ceremonial"),
+      unclassified_sentences = sum(section == "unclassified"),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      opening_pct = round(100 * opening_sentences / total_sentences, 1),
+      policy_pct = round(100 * policy_sentences / total_sentences, 1),
+      closing_pct = round(100 * closing_sentences / total_sentences, 1),
+      unclassified_pct = round(
+        100 * unclassified_sentences / total_sentences,
+        1
+      ),
+      era = case_when(
+        year <= 1920 ~ "Early Confederation",
+        year <= 1960 ~ "Mid-20th Century",
+        year <= 1990 ~ "Late 20th Century",
+        TRUE ~ "Contemporary"
+      )
+    )
+
+  # Clean Corpus
+  clean_corpus <- segmented_data %>%
+    group_by(filename, date, year, parliament) %>%
+    summarise(
+      opening_ceremonial = paste(
+        sentence[section == "opening_ceremonial"],
+        collapse = " "
+      ),
+      policy_content = paste(
+        sentence[section == "policy_content"],
+        collapse = " "
+      ),
+      closing_ceremonial = paste(
+        sentence[section == "closing_ceremonial"],
+        collapse = " "
+      ),
+      opening_sentence_count = sum(section == "opening_ceremonial"),
+      policy_sentence_count = sum(section == "policy_content"),
+      closing_sentence_count = sum(section == "closing_ceremonial"),
+      opening_word_count = str_count(opening_ceremonial, "\\S+") %||% 0,
+      policy_word_count = str_count(policy_content, "\\S+") %||% 0,
+      closing_word_count = str_count(closing_ceremonial, "\\S+") %||% 0,
+      total_sentences = n(),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      era = case_when(
+        year <= 1920 ~ "Early Confederation",
+        year <= 1960 ~ "Mid-20th Century",
+        year <= 1990 ~ "Late 20th Century",
+        TRUE ~ "Contemporary"
+      ),
+      decade = paste0(floor(year / 10) * 10, "s"),
+      policy_content_clean = str_replace_all(
+        policy_content,
+        "[\u201C\u201D\u2018\u2019\u201A\u201E\u2026\u2013\u2014]",
+        "'"
+      ) %>%
+        str_replace_all("\\s+", " ") %>%
+        str_trim(),
+      unclassified_sentences = total_sentences -
+        (opening_sentence_count +
+          policy_sentence_count +
+          closing_sentence_count),
+      needs_review = policy_sentence_count < 5 |
+        policy_word_count < 100 |
+        unclassified_sentences > 0
+    )
+
+  # Validation by Era (This will now work correctly)
+  validation_stats <- speech_summaries %>%
+    group_by(era) %>%
+    summarise(
+      n_speeches = n(),
+      avg_opening_pct = round(mean(opening_pct, na.rm = TRUE), 1),
+      avg_policy_pct = round(mean(policy_pct, na.rm = TRUE), 1),
+      avg_closing_pct = round(mean(closing_pct, na.rm = TRUE), 1),
+      avg_unclassified_pct = round(mean(unclassified_pct, na.rm = TRUE), 1),
+      .groups = "drop"
+    )
+
+  # Flag Issues
+  issues <- speech_summaries %>%
+    mutate(
+      issue = case_when(
+        policy_pct < 40 ~ "Low policy content",
+        opening_pct > 40 ~ "Excessive opening",
+        closing_pct > 40 ~ "Excessive closing",
+        policy_sentences < 10 ~ "Very few policy sentences",
+        unclassified_pct > 10 ~ "High unclassified content",
+        TRUE ~ "OK"
+      )
+    ) %>%
+    filter(issue != "OK")
+
+  log_message(
+    paste(
+      "Generated outputs:",
+      nrow(speech_summaries),
+      "summaries,",
+      nrow(clean_corpus),
+      "corpus entries,",
+      nrow(issues),
+      "issues flagged"
+    ),
+    log_file
+  )
+  return(list(
+    summaries = speech_summaries,
+    corpus = clean_corpus,
+    validation = validation_stats,
+    issues = issues
+  ))
+}
+
+```
 
 ### 3.5: Execution
 This is the main execution block that runs the entire process from start to finish. The functions defined in the previous steps are called in logical order.
@@ -213,5 +531,4 @@ source("R/interactive_segmentation_review.R")
 In this step, we segmented the sentences using a two-stage approach where we ask an LLM to segment our text. We used logical thresholds to identify issues for review. Reviewed and made corrections. 
  
 
-In the next step we will explore the data.
-
+**Next Step:** [Exploratory Analysis of Throne Speeches →](03_Exploratory_Analysis.qmd)

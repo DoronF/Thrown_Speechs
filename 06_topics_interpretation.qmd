@@ -5,7 +5,7 @@ date: "today"
 format: 
   html:
     toc: true
-    toc-location: left
+    toc-location: right
     self-contained: true
     theme: cosmo
     code-overflow: wrap
@@ -39,7 +39,7 @@ source("R/functions.R")
 
 # Load trained models and corpus metadata
 lda_models <- readRDS("output/models/lda_models.rds")
-k_values <- c(4, 6, 8, 10, 12)
+k_values <- c(4, 8)
 
 # Set up API Key
 ANTHROPIC_API_KEY <- Sys.getenv("ANTHROPIC_API_KEY")
@@ -66,7 +66,6 @@ Each element should be an object with these three keys:
 
 Return only the JSON array, starting with [ and ending with ]:
 ```
-
 
 ## 3. Iteratively Interpret Each Topic Set
 Now we'll loop through each model, making a call using `interpret_topic_set_with_llm`, and parse the JSON array result.
@@ -155,10 +154,7 @@ llm_interpretations <- purrr::map2_dfr(
 saveRDS(llm_interpretations, "output/models/llm_topic_labels.rds")
 ```
 
-## Conclusion 
-Now that we have interpretations for our topics, we are ready to analyze the models' gamma values—the proportion of each topic within an individual speech. In the final step, we will visualize how these topic proportions change over time, mapping the thematic shifts in Canada's political discourse.
-
-## Appendix: Detailed Topic Interpretations 
+## Detailed Topic Interpretations 
 
 ```{r display-interpretation-tables, echo=FALSE, results='asis'}
 # Load interpretations previously created for illustrating the results
@@ -193,4 +189,8 @@ purrr::walk(k_values, function(k_val) {
 })
 ```
 
+## Conclusion 
+Now that we have interpretations for our topics, we are ready to analyze the models' gamma values—the proportion of each topic within an individual speech. In the final step, we will visualize how these topic proportions change over time, mapping the thematic shifts in Canada's political discourse.
 
+
+**Next Step:** [Topic Shift Analysis & Validation →](07_Topic_Shift_Analysis.qmd)

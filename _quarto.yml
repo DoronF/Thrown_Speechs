@@ -1,10 +1,79 @@
 project:
-  type: default
-  output-dir: output/docs  
+  type: website
+  output-dir: output/docs  # Consolidated with your existing output structure
   
+website:
+  title: "Statistical Text Mining of Standardized Political Documents"
+  description: "End-to-end NLP pipeline: From historical document OCR to topic modeling insights"
+  
+  navbar:
+    left:
+      - href: 00-Overview.qmd
+        text: Overview
+      - text: "Data Pipeline"
+        menu:
+          - href: 01_Data.qmd
+            text: "Scraping & OCR with LLM"
+          - href: 02_Segmentation.qmd
+            text: "Document Segmentation"
+          - href: 03_Exploratory_Analysis.qmd
+            text: "Exploratory Analysis"
+      - text: "Text Processing"
+        menu:
+          - href: 04_Boilerplate_Identification.qmd
+            text: "Boilerplate Detection"
+          - href: 05_Topics_Extraction.qmd
+            text: "LDA Topic Modeling"
+          - href: 06_Topics_Interpretation.qmd
+            text: "LLM Topic Interpretation"
+          - href: 07_Topic_Shift_Analysis.qmd
+            text: "Final Analysis"
+    right:
+          - icon: github
+            href: https://github.com/DoronF/Thrown_Speechs
+
+  sidebar:
+    style: "floating"
+    collapse-level: 2
+    contents:
+      - section: "Project Overview"
+        contents:
+          - 00-Overview.qmd
+      - section: "Data Collection & Preparation"
+        contents:
+          - 01_Data.qmd
+          - 02_Segmentation.qmd
+          - 03_Exploratory_Analysis.qmd
+      - section: "Natural Language Processing"
+        contents:
+          - 04_Boilerplate_Identification.qmd
+          - 05_Topics_Extraction.qmd
+          - 06_Topics_interpretation.qmd
+      - section: "Analysis & Insights"
+        contents:
+          - 07_Topic_shift_Analysis.qmd
+
+format:
+  html:
+    theme:
+      - cosmo
+   #   - brand.scss  # Make sure this is .scss extension
+   # css: styles.css
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    code-line-numbers: true
+    fig-width: 10
+    fig-height: 6
+    
 execute:
   cache: true
-
+  freeze: auto  # Prevents unnecessary re-execution
+  
 knitr:
   opts_chunk:
     cache.path: "output/cache/"
+    fig.path: "output/figures/"
+    warning: false
+    message: false

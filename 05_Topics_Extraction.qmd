@@ -5,7 +5,7 @@ date: "today"
 format: 
   html:
     toc: true
-    toc-location: left
+    toc-location: right
     self-contained: true
     theme: cosmo
     code-overflow: wrap
@@ -14,13 +14,11 @@ execute:
 ---
 
 ## Overview
-LDA (Latent Dirichlet Allocation) is a probabilistic topic modeling technique that discovers hidden thematic structures in large collections of text documents. It assumes each document is a mixture of topics, and each topic is characterized by a distribution of words, allowing it to automatically identify and extract meaningful topics from unstructured text data. 
-
-This document trains several LDA models with different numbers of topics (`k`). We then evaluate the topics quality and temporal balance across all the models, and rank them to see which ones perform best.
+LDA (Latent Dirichlet Allocation) is a probabilistic topic modeling technique that discovers hidden thematic structures in large collections of text documents. It assumes each document is a mixture of topics, and each topic is characterized by a distribution of words, allowing it to automatically identify and extract meaningful topics from unstructured text data. The model requires us to select the number of topics beforehand. Since it is unknown to us which number of topics is right, we train several LDA models with different numbers of topics (`k`). We then evaluate, compare and rank all the models', topic quality and temporal balance. Finally we choose which number of topics is best overall. 
 
 ## 1. Setup
-We load libraries most notably `topicmodels`, which we will use to train the models.
-we also load our stopwords and boilerplate regex we established in the previous step.
+We load packages, most notably we load `topicmodels` for training the LDA models.
+we also load our `project_stopwords` and `intrusion_regex` (boilerplate), we established in the previous step.
 ```{r setup, message=FALSE, warning=FALSE, echo = TRUE}
 # Load all necessary libraries
 library(dplyr)
@@ -50,7 +48,7 @@ k_values <- c(4, 6, 8, 10, 12)
 
 We prepare the text and create a single Document-Term Matrix (DTM) using `tidytext`.
 
-```{r pre-processing, echo = TRUE}
+```{r pre-processing, echo = TRUE , cache.lazy=FALSE}
 # Prepare tidy word list
 lemmatized_policy_words <- clean_corpus %>%
   mutate(
@@ -71,10 +69,9 @@ dtm_tm <- lemmatized_policy_words %>%
 
 ## 3. Iterative LDA Topic Modeling
 
-We now train a separate LDA model for each `k` value (a range of even numbers between 4 and 12).
+We now train a separate LDA model for each `k` value `k_values <- c(4, 6, 8, 10, 12)`.
 
 ```{r lda_models, cache=TRUE, eval=FALSE, echo = TRUE}
-
 tic("Total training time for all models")
 lda_models <- k_values %>%
   purrr::map(function(k) {
@@ -86,20 +83,18 @@ saveRDS(lda_models, "output/models/lda_models.rds")
 ```
 
 ## 4. Model Results and Analysis
-To evaluate the resulting topics we review the following aspects:
+To evaluate the results we review the following:  
 
 * **Topic Distribution by Era**: Are the topics evenly distributed across the eras?
 * **Topic Prominence Over Time**: Do the topics show clear prominence trends? 
-* **Topic Quality**: Specifically Dominance (how often a topic is the primary theme of a speech) vs. Exclusivity (uniqueness). 
+* **Topic Quality**: Dominance (how often a topic is the primary theme of a speech) vs. Exclusivity (uniqueness). 
 
 ```{r load_saved_model, echo = FALSE}
 # load models to save time..
 lda_models <- readRDS("output/models/lda_models.rds")
 ```
 
-
-
-```{r generate-all-analyses, echo=FALSE, warning=FALSE, message=FALSE, cache = TRUE}
+```{r generate-all-plots, echo=FALSE, warning=FALSE, message=FALSE, cache = TRUE}
 # Set consistent ranges for all plots
 coherence_range <- c(0, 0.45)
 exclusivity_range <- c(0, 21)
@@ -189,7 +184,13 @@ create_time_series_plot <- function(yearly_data, topic_metrics, k) {
       group = factor(topic)
     )
   ) +
-    geom_smooth(method = "loess", se = FALSE, linewidth = 1.1, alpha = 0.8, span = 0.3) +
+    geom_smooth(
+      method = "loess",
+      se = FALSE,
+      linewidth = 1.1,
+      alpha = 0.8,
+      span = 0.3
+    ) +
     scale_y_continuous(limits = gamma_range) +
     scale_x_continuous(breaks = seq(1870, 2020, 20)) +
     scale_color_discrete(name = "Topic") +
@@ -233,7 +234,6 @@ create_coherence_plot <- function(topic_metrics, k) {
     theme(legend.position = "none")
 }
 
-# Function to create dominance plot
 create_dominance_plot <- function(topic_metrics, k) {
   ggplot(
     topic_metrics,
@@ -259,6 +259,7 @@ create_dominance_plot <- function(topic_metrics, k) {
     theme_minimal() +
     theme(legend.position = "none")
 }
+
 
 # Function to create era bar plot
 create_era_bar_plot <- function(topic_metrics, k) {
@@ -311,24 +312,30 @@ create_all_plots <- function(model, k) {
     yearly_data = metrics$yearly_data
   ))
 }
-tic("Generating all plots")
+
 # Generate all plots for all models
 individual_plots_list <- purrr::map2(lda_models, k_values, create_all_plots)
 names(individual_plots_list) <- paste0("k_", k_values)
-toc()
+
 
 # Extract plot types
 time_series_plots <- purrr::map(individual_plots_list, ~ .x$time_series)
-coherence_plots <- purrr::map(individual_plots_list, ~ .x$coherence)
+#coherence_plots <- purrr::map(individual_plots_list, ~ .x$coherence)
 dominance_plots <- purrr::map(individual_plots_list, ~ .x$dominance)
 era_bar_plots <- purrr::map(individual_plots_list, ~ .x$era_bar)
 ```
 
 ### 4.1 **Topic Distribution by Era**
-We can see how many topics peaked in the following eras: Pre-War, Mid-Century and Modern Era. we want to see even distribution more or less so that topics are not concentrated in one time period. 
+We can see how many topics peaked in each era: 
+
+* **Pre-War** 1867 - 1940
+* **Mid-Century** 1940 - 1980
+* **Modern Era** 1980 - 2025
+
+ we want to see even distribution more or less so that topics are not concentrated in one time period. 
 
 #### **Era Distribution Grid**
-```{r era_grid, echo = FALSE}
+```{r era_plot, echo = FALSE}
 # Create grid of bar charts
 library(patchwork)
 era_grid <- wrap_plots(era_bar_plots, ncol = 3)
@@ -413,13 +420,15 @@ most_even_k <- evenness_analysis$k_value[1]
 #cat(sprintf("\nMost even distribution: k = %d\n", most_even_k))
 ```
 
-Most even distribution: k = `r most_even_k`
+Most even distribution: k = **`r most_even_k`**
+
+***
 
 ### 4.2 **Topic Prominence Over Time**
 
-This grid compares the topic prominence line charts for each `k` value. A good model should show distinct and interpretable trend lines.
+This plot compares the topic prominence line charts for each `k` value. A good model should show distinct and interpretable trend lines.
 
-#### **Time Series Grid**
+#### **Time Series Plot**
 ```{r time_series_grid, warning=FALSE, message=FALSE}
 # Grid of time series plots
 time_series_grid <- wrap_plots(time_series_plots, ncol = 3)
@@ -468,7 +477,7 @@ variance_analysis <- prominence_data %>%
 knitr::kable(variance_analysis)
 ```
 
-Variance Analysis (lower avg_variance = more stable topics)
+Variance Analysis (lower `avg_variance` = more stable topics)
 
 #### **"Dead Topics" Analysis**
 Count topics that never achieve meaningful prominence
@@ -526,7 +535,8 @@ range_analysis <- prominence_data %>%
 
 knitr::kable(range_analysis)
 ```
-Range Analysis (higher avg_range might = better topic separation)
+
+Range Analysis (higher `avg_range` might = better topic separation)
 
 #### **Combined Ranking**
 ```{r}
@@ -560,47 +570,44 @@ combined_ranking <- tibble(
 knitr::kable(combined_ranking)
 ```
 
-**Combined Ranking** (lower overall_rank = better model): 
+**Combined Ranking** (lower overall rank = better model): 
 * Variance rank: 1 = most stable topics  
 * Dead rank: 1 = fewest useless topics   
 * Range rank: 1 = best topic separation
 
 
-
-
-
-```{r coherence_grid, echo = FALSE, eval = FALSE}
-### Topic Quality: Coherence vs. Exclusivity
-#This grid compares the coherence and exclusivity of topics for each k. Good topics should ideally be #in the top-right (high coherence, high exclusivity). The dashed line represents y=x.
-#### **Coherence Grid**
-# Grid of coherence plots
-coherence_grid <- wrap_plots(coherence_plots, ncol = 3)
-
-print(coherence_grid)
-```
+---
 
 
 ### 4.3 Topic Quality: Dominance vs. Exclusivity
-This grid compares topic dominance (how often a topic is the primary theme of a speech) with exclusivity. This helps identify which topics are both important and unique.
+This plot compares topic dominance (how often a topic is the primary theme of a speech) with exclusivity. This helps identify which topics are both important and unique.
 
-#### **Dominance Grid**
+#### **Dominance Plot**
 
 ```{r dominance_grid, echo = FALSE}
-# Grid of dominance plots
 dominance_grid <- wrap_plots(dominance_plots, ncol = 3)
 print(dominance_grid)
+
 ```
 
-Sample of topic metrics data:
+● Pre-War (pre-1940) ▲ Mid-Century (1940-1980) ■ Modern Era (1980+)
+
+#### **Sample of topic metrics data:**
 ```{r}
 # Extract all topic metrics for quality analysis (excluding coherence)
-all_topic_metrics <- purrr::map2_dfr(individual_plots_list, k_values, function(plot_list, k) {
-  plot_list$topic_metrics %>%
-    mutate(k_value = k)
-})
+all_topic_metrics <- purrr::map2_dfr(
+  individual_plots_list,
+  k_values,
+  function(plot_list, k) {
+    plot_list$topic_metrics %>%
+      mutate(k_value = k)
+  }
+)
 
-
-knitr::kable(head(all_topic_metrics %>% select(k_value, topic, exclusivity, dominance_count, era)))
+knitr::kable(head(
+  all_topic_metrics %>%
+    select(k_value, topic, exclusivity, dominance_count, era)
+))
 ```
 
 #### **Dominance + Exclusivity Quality Score**
@@ -610,18 +617,18 @@ Model Quality Summary (higher avg_quality_score = better):
 # Normalize each metric to 0-1 scale
 normalized_metrics <- all_topic_metrics %>%
   mutate(
-    # Normalize exclusivity (higher = better) 
-    exclusivity_norm = (exclusivity - min(exclusivity, na.rm = TRUE)) / 
-                       (max(exclusivity, na.rm = TRUE) - min(exclusivity, na.rm = TRUE)),
+    # Normalize exclusivity (higher = better)
+    exclusivity_norm = (exclusivity - min(exclusivity, na.rm = TRUE)) /
+      (max(exclusivity, na.rm = TRUE) - min(exclusivity, na.rm = TRUE)),
     # Normalize dominance (higher = better)
-    dominance_norm = (dominance_count - min(dominance_count, na.rm = TRUE)) / 
-                     (max(dominance_count, na.rm = TRUE) - min(dominance_count, na.rm = TRUE)),
-    
+    dominance_norm = (dominance_count - min(dominance_count, na.rm = TRUE)) /
+      (max(dominance_count, na.rm = TRUE) - min(dominance_count, na.rm = TRUE)),
+
     # Combined quality score (equal weighting)
     quality_score = (exclusivity_norm + dominance_norm) / 2,
-    
+
     # Alternative weighted score (if you prefer to emphasize one metric)
-    weighted_score = (0.6 * exclusivity_norm + 0.4 * dominance_norm)  # Slightly favor exclusivity
+    weighted_score = (0.6 * exclusivity_norm + 0.4 * dominance_norm) # Slightly favor exclusivity
   )
 
 # Analyze by model
@@ -630,9 +637,12 @@ model_quality_summary <- normalized_metrics %>%
   summarise(
     avg_quality_score = round(mean(quality_score, na.rm = TRUE), 3),
     avg_weighted_score = round(mean(weighted_score, na.rm = TRUE), 3),
-    high_quality_topics = sum(quality_score > 0.7, na.rm = TRUE),  # Topics scoring > 70%
-    balanced_topics = sum(quality_score > 0.5 & quality_score <= 0.7, na.rm = TRUE), # 50-70%
-    low_quality_topics = sum(quality_score < 0.3, na.rm = TRUE),   # Topics scoring < 30%
+    high_quality_topics = sum(quality_score > 0.7, na.rm = TRUE), # Topics scoring > 70%
+    balanced_topics = sum(
+      quality_score > 0.5 & quality_score <= 0.7,
+      na.rm = TRUE
+    ), # 50-70%
+    low_quality_topics = sum(quality_score < 0.3, na.rm = TRUE), # Topics scoring < 30%
     quality_std = round(sd(quality_score, na.rm = TRUE), 3),
     avg_exclusivity = round(mean(exclusivity, na.rm = TRUE), 1),
     avg_dominance = round(mean(dominance_count, na.rm = TRUE), 1),
@@ -644,28 +654,25 @@ knitr::kable(model_quality_summary)
 ```
 
 #### **Principal Component Analysis on Dominance + Exclusivity**
-PCA Summary:
+The PCA reveals that dominance and exclusivity are moderately correlated, with 70% of the variance captured by the first principal component. This suggests these two quality metrics largely move together - topics that dominate more speeches tend to also be more exclusive (have unique vocabulary).
 ```{r}
-# Create matrix for PCA 
+# Create matrix for PCA
 pca_data <- all_topic_metrics %>%
   select(exclusivity, dominance_count) %>%
   na.omit()
 
-
 pca_result <- prcomp(pca_data, scale. = TRUE, center = TRUE)
-  
 
 print(summary(pca_result))
-  
 
 pca_scores <- all_topic_metrics %>%
   select(k_value, topic, exclusivity, dominance_count) %>%
   na.omit() %>%
   mutate(
-    pc1_score = predict(pca_result)[,1],  # First principal component
-    pc2_score = predict(pca_result)[,2]   # Second principal component
+    pc1_score = predict(pca_result)[, 1], # First principal component
+    pc2_score = predict(pca_result)[, 2] # Second principal component
   )
-  
+
 # Summarize by model
 pca_model_summary <- pca_scores %>%
   group_by(k_value) %>%
@@ -675,32 +682,33 @@ pca_model_summary <- pca_scores %>%
     pc1_std = round(sd(pc1_score), 3),
     .groups = "drop"
   ) %>%
-  arrange(desc(avg_pc1))  # Higher PC1 generally indicates better overall quality
+  arrange(desc(avg_pc1)) # Higher PC1 generally indicates better overall quality
 ```
 
 PCA Model Summary (higher avg_pc1 = better overall quality):
 
 ```{r}
-
 knitr::kable(pca_model_summary)
 ```
 
 Variable Contributions to PC1:
 ```{r}
-print(round(pca_result$rotation[,1], 3))
-  
-# Check correlation between dominance and exclusivity
-correlation <- cor(pca_data$exclusivity, pca_data$dominance_count, use = "complete.obs")
+print(round(pca_result$rotation[, 1], 3))
 
+# Check correlation between dominance and exclusivity
+correlation <- cor(
+  pca_data$exclusivity,
+  pca_data$dominance_count,
+  use = "complete.obs"
+)
 ```
 
-Correlation between Exclusivity and Dominance: `{r} correlation`
+Correlation between Exclusivity and Dominance: **`{r} correlation`**
 
 #### **Topic Efficiency Analysis**
 Topic Efficiency Analysis (higher efficiency_rate = more good topics per k):
 
 ```{r}
-
 efficiency_analysis <- normalized_metrics %>%
   group_by(k_value) %>%
   summarise(
@@ -710,31 +718,31 @@ efficiency_analysis <- normalized_metrics %>%
     avg_exclusivity_per_topic = round(mean(exclusivity, na.rm = TRUE), 2),
     avg_dominance_per_topic = round(mean(dominance_count, na.rm = TRUE), 2),
     exclusivity_per_k = round(sum(exclusivity, na.rm = TRUE) / total_topics, 2),
-    dominance_per_k = round(sum(dominance_count, na.rm = TRUE) / total_topics, 2),
+    dominance_per_k = round(
+      sum(dominance_count, na.rm = TRUE) / total_topics,
+      2
+    ),
     .groups = "drop"
   ) %>%
   arrange(desc(efficiency_rate))
 
-
 knitr::kable(efficiency_analysis)
-
 ```
 
 #### **Final Topic Quality Ranking**
 
 Final Ranking (lower final_rank = better dominance + exclusivity combination):
 ```{r}
-
 final_ranking <- tibble(k_value = k_values) %>%
   left_join(
-    model_quality_summary %>% 
+    model_quality_summary %>%
       mutate(quality_rank = rank(desc(avg_quality_score))) %>%
       select(k_value, quality_rank),
     by = "k_value"
   ) %>%
   left_join(
-    if(exists("pca_model_summary")) {
-      pca_model_summary %>% 
+    if (exists("pca_model_summary")) {
+      pca_model_summary %>%
         mutate(pca_rank = rank(desc(avg_pc1))) %>%
         select(k_value, pca_rank)
     } else {
@@ -743,14 +751,17 @@ final_ranking <- tibble(k_value = k_values) %>%
     by = "k_value"
   ) %>%
   left_join(
-    efficiency_analysis %>% 
+    efficiency_analysis %>%
       mutate(efficiency_rank = rank(desc(efficiency_rate))) %>%
       select(k_value, efficiency_rank),
     by = "k_value"
   ) %>%
   rowwise() %>%
   mutate(
-    combined_score = mean(c(quality_rank, pca_rank, efficiency_rank), na.rm = TRUE),
+    combined_score = mean(
+      c(quality_rank, pca_rank, efficiency_rank),
+      na.rm = TRUE
+    ),
     final_rank = rank(combined_score)
   ) %>%
   ungroup() %>%
@@ -758,3 +769,15 @@ final_ranking <- tibble(k_value = k_values) %>%
 
 knitr::kable(final_ranking)
 ```
+
+## Conclusion
+
+The analysis reveals a clear trade-off between topic quality and temporal balance.
+
+- **For Highest Topic Quality:** The **k=4** model is the undisputed winner. It produces the most distinct, dominant, and efficient topics. If the goal is to identify the strongest, most interpretable themes in the corpus, **k=4** is the best choice.
+    
+- **For Best Temporal Balance:** The **k=8** model offers the most even distribution of topics across historical eras (Pre-War, Mid-Century, Modern Era) and demonstrates high stability in topic prominence over time. If the goal is to analyze how different themes evolve and ensure all periods are represented, **k=8** is the superior option.
+
+Since they have different things to tell us about the texts, we choose **both**.
+
+**Next Step:** [LLM Interpretation of Topic Models →](06_Topics_interpretation.qmd)

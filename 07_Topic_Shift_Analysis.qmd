@@ -1,38 +1,54 @@
 ---
-title: "Topic Shift Analysis"
+title: "Topic Shift Analysis & Validation"
 author: "Doron Feingold"
 date: "today"
-format: 
-  html:
-    toc: true
-    toc-location: left
-    self-contained: true
-    theme: cosmo
-    code-overflow: wrap
+format:
+    html:
+        toc: true
+        toc-location: right
+        self-contained: true
+        theme: cosmo
+        code-overflow: wrap
+execute:
+    echo: false
 ---
 
+
+
 ## Overview
-Now that we have labels for out topic we can plot the topic shift and review stattistics that might help us understand trends accross the different models.
+
+Now that we have labels for out topic we can plot the topic shift and review statistics that might help us understand trends across the different models.
 
 These metrics describe the behavior and nature of each topic over time.
 
-#### Topic Volatility
+#### **Topic Volatility**
+
 *How "spiky" or "stable" is a topic's prominence over time?*
+
 For each topic, calculate the standard deviation or coefficient of variation of its average gamma scores across all speeches.
+
 **Interpretation:** A high volatility score indicates an "event-driven" topic that appears intensely and then fades (e.g., war, pandemic). A low score suggests a stable, persistent "background" topic that is always present.
 
-#### Topic Persistence
+
+#### **Topic Persistence**
+
 *Does a topic remain relevant long after its peak, or does it disappear completely?*
 For each topic, calculate a "persistence score" by dividing its average gamma in the most recent year by its all-time peak gamma.
+
 **Interpretation**: A score close to 1 means the topic is still highly relevant today, even if its peak was long ago. A score close to 0 means the topic has largely faded from the discourse.
 
-#### Topic Exclusivity
+
+
+#### **Topic Exclusivity**
+
 *How unique are the words that define a topic?*
 For each topic, count how many of its top 15 words are not in the top 15 words of any other topic in the same model.
 
-Interpretation: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.
 
-```{r setup, message=FALSE, warning=FALSE, echo = FALSE}
+**Interpretation**: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.
+
+```{r setup, message=FALSE, warning=FALSE}
+
 # Load libraries
 library(dplyr)
 library(tidytext)
@@ -52,207 +68,587 @@ source("R/functions.R")
 # Load trained models, metadata, AND the LLM labels
 lda_models <- readRDS("output/models/lda_models.rds")
 llm_topic_labels <- readRDS("output/models/llm_topic_labels.rds")
-k_values <- c(4, 6, 8, 10, 12)
+k_values <- c(4, 8)
 
 # Load the segmented corpus
 clean_corpus <- readr::read_csv(
   "output/segmentation/llm_clean_segmented_corpus.csv"
 )
-
 ```
 
 
-```{r generate-all-analyses-mixed, echo=FALSE, warning=FALSE, message=FALSE}
+```{r generate-all-analyses-mixed, warning=FALSE, message=FALSE}
 llm_topic_labels <- readRDS("output/models/llm_topic_labels.rds")
+llm_topic_labels <- llm_topic_labels %>%
+  filter(k %in% k_values)
 
-analysis_results <- purrr::map2(lda_models, k_values, function(model, k) {
-  # --- 1. Create DECADE-LEVEL data for the PLOT ---
-  plot_data <- tidy(model, matrix = "gamma") %>%
-    left_join(
-      clean_corpus %>% select(filename, decade),
-      by = c("document" = "filename")
-    ) %>%
-    group_by(decade, topic) %>%
-    summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
-    mutate(topic = as.character(topic)) %>%
-    left_join(
-      llm_topic_labels %>%
-        filter(k == !!k) %>%
-        mutate(topic = as.character(topic)),
-      by = "topic"
-    )
+analysis_results <- purrr::map2(
+  lda_models[c(1, 3)],
+  k_values,
 
-  if (nrow(plot_data) == 0) {
-    return(NULL)
-  }
-
-  # --- 2. Create the DECADE-LEVEL plot ---
-  main_plot <- ggplot(
-    plot_data,
-    aes(x = decade, y = avg_gamma, group = label, color = label)
-  ) +
-    geom_line(linewidth = 1.2, alpha = 0.8) +
-    theme_minimal(base_size = 14) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1),
-      legend.position = "none"
-    ) +
-    labs(
-      title = paste("Prominence of Policy Themes (k =", k, "Model)"),
-      subtitle = "Topic themes and their peak prominence over time",
-      x = "Decade",
-      y = "Average Topic Prominence (Gamma)"
-    )
-
-  g <- ggplot_build(main_plot)
-  color_map <- g$data[[1]] %>%
-    distinct(group, colour) %>%
-    mutate(label = sort(unique(plot_data$label))) %>%
-    select(label, colour) %>%
-    tibble::deframe()
-
-  start_year <- 1867
-
-  # --- 3. NEW: Create YEARLY-LEVEL data for the STATS table ---
-  yearly_data <- tidy(model, matrix = "gamma") %>%
-    left_join(
-      clean_corpus %>% select(filename, year),
-      by = c("document" = "filename")
-    ) %>%
-    group_by(year, topic) %>%
-    summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
-    mutate(topic = as.character(topic)) %>%
-    left_join(
-      llm_topic_labels %>%
-        filter(k == !!k) %>%
-        mutate(topic = as.character(topic)),
-      by = "topic"
-    )
-
-  # --- 4. Calculate Advanced Statistics using YEARLY data ---
-  volatility_data <- yearly_data %>%
-    group_by(Topic = label) %>%
-    summarise(volatility = sd(avg_gamma), .groups = "drop")
-
-  persistence_data <- yearly_data %>%
-    group_by(Topic = label) %>%
-    summarise(
-      peak_gamma = max(avg_gamma),
-      latest_gamma = first(avg_gamma, order_by = desc(year)),
-      .groups = "drop"
-    ) %>%
-    mutate(persistence = latest_gamma / peak_gamma) %>%
-    select(Topic, persistence)
-
-  all_top_terms <- tidy(model, matrix = "beta") %>%
-    group_by(topic) %>%
-    slice_max(beta, n = 25) %>%
-    ungroup()
-  unique_term_counts <- all_top_terms %>% count(term) %>% filter(n == 1)
-  exclusivity_data <- all_top_terms %>%
-    filter(term %in% unique_term_counts$term) %>%
-    count(topic, name = "exclusivity") %>%
-    mutate(topic = as.character(topic)) %>%
-    left_join(distinct(yearly_data, Topic = label, topic), by = "topic") %>%
-    select(Topic, exclusivity)
-
-  # --- 5. Combine All YEARLY Metrics into the Stats Table ---
-  sorted_peaks <- yearly_data %>%
-    group_by(label) %>%
-    slice_max(order_by = avg_gamma, n = 1, with_ties = FALSE) %>%
-    ungroup() %>%
-    select(Topic = label, `Peak Year` = year) %>%
-    arrange(`Peak Year`) %>%
-    left_join(volatility_data, by = "Topic") %>%
-    left_join(persistence_data, by = "Topic") %>%
-    left_join(exclusivity_data, by = "Topic")
-
-  peak_years <- sorted_peaks$`Peak Year`
-  gaps <- c(max(0, peak_years[1] - start_year))
-  if (length(peak_years) > 1) {
-    for (i in 2:length(peak_years)) {
-      gaps[i] <- peak_years[i] - peak_years[i - 1]
+  function(model, k) {
+    # Create DECADE-LEVEL data for the PLOT
+    plot_data <- tidy(model, matrix = "gamma") %>%
+      left_join(
+        clean_corpus %>% select(filename, decade),
+        by = c("document" = "filename")
+      ) %>%
+      group_by(decade, topic) %>%
+      summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
+      mutate(topic = as.character(topic)) %>%
+      left_join(
+        llm_topic_labels %>%
+          filter(k == !!k) %>%
+          mutate(topic = as.character(topic)),
+        by = "topic"
+      )
+    if (nrow(plot_data) == 0) {
+      return(NULL)
     }
+
+    main_plot <- ggplot(
+      plot_data,
+      aes(x = decade, y = avg_gamma, group = label, color = label)
+    ) +
+      geom_line(linewidth = 1.2, alpha = 0.8) +
+      theme_minimal(base_size = 14) +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none"
+      ) +
+
+      labs(
+        title = paste("Prominence of Policy Themes (k =", k, "Model)"),
+        subtitle = "Topic themes and their peak prominence over time",
+        x = "Decade",
+        y = "Average Topic Prominence (Gamma)"
+      )
+
+    g <- ggplot_build(main_plot)
+
+    color_map <- g$data[[1]] %>%
+      distinct(group, colour) %>%
+      mutate(label = sort(unique(plot_data$label))) %>%
+      select(label, colour) %>%
+      tibble::deframe()
+
+    start_year <- 1867
+
+    yearly_data <- tidy(model, matrix = "gamma") %>%
+      left_join(
+        clean_corpus %>% select(filename, year),
+        by = c("document" = "filename")
+      ) %>%
+      group_by(year, topic) %>%
+      summarise(avg_gamma = mean(gamma), .groups = "drop") %>%
+      mutate(topic = as.character(topic)) %>%
+      left_join(
+        llm_topic_labels %>%
+          filter(k == !!k) %>%
+          mutate(topic = as.character(topic)),
+        by = "topic"
+      )
+
+    volatility_data <- yearly_data %>%
+      group_by(Topic = label) %>%
+      summarise(volatility = sd(avg_gamma), .groups = "drop")
+    persistence_data <- yearly_data %>%
+      group_by(Topic = label) %>%
+      summarise(
+        peak_gamma = max(avg_gamma),
+        latest_gamma = first(avg_gamma, order_by = desc(year)),
+        .groups = "drop"
+      ) %>%
+      mutate(persistence = latest_gamma / peak_gamma) %>%
+      select(Topic, persistence)
+
+    all_top_terms <- tidy(model, matrix = "beta") %>%
+      group_by(topic) %>%
+      slice_max(beta, n = 25) %>%
+      ungroup()
+
+    unique_term_counts <- all_top_terms %>% count(term) %>% filter(n == 1)
+
+    exclusivity_data <- all_top_terms %>%
+      filter(term %in% unique_term_counts$term) %>%
+      count(topic, name = "exclusivity") %>%
+      mutate(topic = as.character(topic)) %>%
+      left_join(distinct(yearly_data, Topic = label, topic), by = "topic") %>%
+
+      select(Topic, exclusivity)
+
+    sorted_peaks <- yearly_data %>%
+      group_by(label) %>%
+      slice_max(order_by = avg_gamma, n = 1, with_ties = FALSE) %>%
+      ungroup() %>%
+      select(Topic = label, `Peak Year` = year) %>%
+      arrange(`Peak Year`) %>%
+      left_join(volatility_data, by = "Topic") %>%
+      left_join(persistence_data, by = "Topic") %>%
+      left_join(exclusivity_data, by = "Topic")
+
+    peak_years <- sorted_peaks$`Peak Year`
+
+    gaps <- c(max(0, peak_years[1] - start_year))
+
+    if (length(peak_years) > 1) {
+      for (i in 2:length(peak_years)) {
+        gaps[i] <- peak_years[i] - peak_years[i - 1]
+      }
+    }
+
+    stats_table_data <- sorted_peaks
+    #%>% mutate(`Years Between Peaks` = gaps)
+
+    stats_table <- stats_table_data %>%
+      mutate(
+        Color = cell_spec("", "html", background = color_map[Topic]),
+        .before = 1
+      ) %>%
+      kbl(
+        escape = FALSE,
+        caption = "Topic Statistics and Cadence (Yearly)",
+        col.names = c(
+          "",
+          "Topic",
+          "Peak Year",
+          "Volatility",
+          "Persistence",
+          "Exclusivity"
+          #  "Years Between Peaks"
+        ),
+        digits = 2
+      ) %>%
+      kable_styling(
+        bootstrap_options = "condensed",
+        full_width = FALSE,
+        position = "left"
+      ) %>%
+      column_spec(1, width = "30px") %>%
+      column_spec(2, width = "18em")
+
+    list(
+      stats_table = stats_table,
+      main_plot = main_plot,
+      yearly_data = yearly_data,
+      color_map = color_map
+    )
   }
+)
 
-  stats_table_data <- sorted_peaks %>% mutate(`Years Between Peaks` = gaps)
-
-  stats_table <- stats_table_data %>%
-    mutate(
-      Color = cell_spec("", "html", background = color_map[Topic]),
-      .before = 1
-    ) %>%
-    kbl(
-      escape = FALSE,
-      caption = "Topic Statistics and Cadence (Yearly)",
-      col.names = c(
-        "",
-        "Topic",
-        "Peak Year",
-        "Volatility",
-        "Persistence",
-        "Exclusivity",
-        "Years Between Peaks"
-      ),
-      digits = 2
-    ) %>%
-    kable_styling(
-      bootstrap_options = "condensed",
-      full_width = FALSE,
-      position = "left"
-    ) %>%
-    column_spec(1, width = "30px") %>%
-    column_spec(2, width = "18em")
-
-  list(
-    stats_table = stats_table,
-    main_plot = main_plot
-  )
-})
 
 names(analysis_results) <- paste0("k_", k_values)
+
 ```
 
-## 4 Topics
-
-
-
-```{r display-k4, results='asis', echo=FALSE}
-# Explicitly print each object
+## 4 Topics 
+We use the 4 topic model for more defined and interpretable topics. 
+```{r k4-table, results='asis'}
 print(analysis_results$k_4$stats_table)
+```
+
+The plot is striking. The topics are well defined and a clear pattern of a synchronized raising and declining prominence (stable Volatility). The topic labels seem to fit well with the eras each topic represents. 
+
+```{r k4-plot}
 print(analysis_results$k_4$main_plot)
 ```
 
-## 6 Topics
+## 8 Topics
+The 8 topics model is more temporal. Even though there more topics they are evenly exclusive.
 
-```{r display-k6, results='asis', echo=FALSE}
-# Explicitly print each object
-print(analysis_results$k_6$stats_table)
-print(analysis_results$k_6$main_plot)
+```{r k8-table, results='asis'}
+print(analysis_results$k_8$stats_table)
 ```
 
-## 8 Topics
+We now see topic that declined in prominence and later reemerge, like "War & International Relations". We see periods where topics peek with less prominence. Topics in the early and late years, appear to have strong prominence.
 
-```{r display-k8, results='asis', echo=FALSE}
-# Explicitly print each object
-print(analysis_results$k_8$stats_table)
+```{r k8-plot}
 print(analysis_results$k_8$main_plot)
 ```
 
-## 10 Topics
+## Validation against Major Events
+To validate the topics prominence we compare them against major events and governments.
 
-```{r display-k10, results='asis', echo=FALSE}
-# Explicitly print each object
-print(analysis_results$k_10$stats_table)
-print(analysis_results$k_10$main_plot)
+### Major Canadian Historical Events
+The table below lists partial but uncontroversial, major Canadian historical events marked in the plots below for.
+
+```{r events-table, results='asis'}
+# Define major historical events
+major_events <- data.frame(
+  Date = c(
+    "1867",
+    "1885",
+    "1914",
+    "1918",
+    "1929",
+    "1939",
+    "1945",
+    "1959",
+    "1973",
+    "1982",
+    "1995",
+    "2001",
+    "2020"
+  ),
+  Event = c(
+    "Confederation: The Dominion of Canada is formed.",
+    "Completion of the Canadian Pacific Railway.",
+    "Canada enters World War I.",
+    "World War I ends.",
+    "Great Depression begins.",
+    "Canada enters World War II.",
+    "World War II ends.",
+    "Suez Crisis",
+    "Oil Embargo",
+    "Canada Act 1982: Patriation of the Constitution.",
+    "Widespread adoption of the internet.",
+    "Canada joins the Afghanistan War.",
+    "COVID-19 pandemic: WHO declares a global pandemic."
+  )
+) %>%
+  dplyr::mutate(
+    Year = as.numeric(substr(Date, 1, 4))
+  )
+
+major_events %>%
+  dplyr::select(Date, Event) %>%
+  kbl(
+    caption = "Major Canadian Historical Events Since 1867",
+    col.names = c("Date", "Event"),
+    escape = FALSE
+  ) %>%
+  kable_styling(
+    bootstrap_options = "condensed",
+    full_width = FALSE,
+    position = "left"
+  ) %>%
+  column_spec(1, width = "10em") %>%
+  column_spec(2, width = "25em")
 ```
 
-## 12 Topics
+```{r k4-event-plot, warning=FALSE, message=FALSE}
 
-```{r display-k12, results='asis', echo=FALSE}
-# Explicitly print each object
-print(analysis_results$k_12$stats_table)
-print(analysis_results$k_12$main_plot)
+# Get plot data
+k4_plot_data <- analysis_results$k_4$main_plot$data
+
+# Ensure decade is numeric
+k4_plot_data <- k4_plot_data %>%
+  dplyr::mutate(decade = as.numeric(decade))
+
+# Create event plot for k=4
+k4_event_plot <- ggplot(
+  k4_plot_data,
+  aes(x = decade, y = avg_gamma, group = label, color = label)
+) +
+  geom_line(linewidth = 1.2, alpha = 0.8) +
+  geom_vline(
+    xintercept = major_events$Year,
+    linetype = "dashed",
+    color = "black",
+    alpha = 0.5
+  ) +
+  geom_text(
+    data = major_events,
+    aes(
+      x = Year,
+      y = max(k4_plot_data$avg_gamma, na.rm = TRUE) * 0.9,
+      label = Date
+    ),
+    angle = 90,
+    vjust = -0.5,
+    hjust = 1,
+    size = 3,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 9),
+    plot.margin = margin(t = 10, r = 10, b = 60, l = 10)
+  ) +
+  guides(color = guide_legend(ncol = 2)) +
+  labs(
+    title = "Prominence of Policy Themes with Major Events",
+    subtitle = "Topic themes with major historical events",
+    x = "Decade",
+    y = "Average Topic Prominence (Gamma)"
+  )
+
+print(k4_event_plot)
+```
+
+```{r k8-event-plot, warning=FALSE, message=FALSE}
+# Get plot data
+k8_plot_data <- analysis_results$k_8$main_plot$data
+
+
+# Ensure decade is numeric
+k8_plot_data <- k8_plot_data %>%
+  dplyr::mutate(decade = as.numeric(decade))
+
+# Create event plot for k=8
+k8_event_plot <- ggplot(
+  k8_plot_data,
+  aes(x = decade, y = avg_gamma, group = label, color = label)
+) +
+  geom_line(linewidth = 1.2, alpha = 0.8) +
+  geom_vline(
+    xintercept = major_events$Year,
+    #linetype = "dashed",
+    color = "black",
+    alpha = 0.5
+  ) +
+  geom_text(
+    data = major_events,
+    aes(
+      x = Year,
+      y = max(k8_plot_data$avg_gamma, na.rm = TRUE) * 0.9,
+      label = Date
+    ),
+    angle = 90,
+    vjust = -0.5,
+    hjust = 1,
+    size = 3,
+    color = "black",
+    inherit.aes = FALSE
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 8),
+    plot.margin = margin(t = 10, r = 10, b = 60, l = 10)
+  ) +
+  guides(color = guide_legend(ncol = 3)) +
+  labs(
+    title = "Prominence of Policy Themes with Major Events",
+    subtitle = "Topic themes with major Canadian historical events marked",
+    x = "Decade",
+    y = "Average Topic Prominence (Gamma)"
+  )
+
+print(k8_event_plot)
 ```
 
 
+## Governments 
+We can also compare the topics prominence against the different governments and see if they "fit".
+```{r}
+canadian_governments <- data.frame(
+  year = c(
+    1867,
+    1872,
+    1874,
+    1878,
+    1882,
+    1887,
+    1891,
+    1891,
+    1892,
+    1894,
+    1896,
+    1896,
+    1900,
+    1904,
+    1908,
+    1911,
+    1917,
+    1921,
+    1925,
+    1926,
+    1926,
+    1930,
+    1935,
+    1940,
+    1945,
+    1949,
+    1953,
+    1957,
+    1958,
+    1962,
+    1963,
+    1965,
+    1968,
+    1972,
+    1974,
+    1979,
+    1980,
+    1984,
+    1984,
+    1988,
+    1993,
+    1993,
+    1997,
+    2000,
+    2004,
+    2006,
+    2008,
+    2011,
+    2015,
+    2019,
+    2021,
+    2025
+  ),
+  party = c(
+    "Conservative",
+    "Conservative",
+    "Liberal",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Conservative",
+    "Conservative",
+    "Liberal",
+    "Conservative",
+    "Liberal",
+    "Conservative",
+    "Conservative",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Progressive Conservative",
+    "Progressive Conservative",
+    "Progressive Conservative",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Progressive Conservative",
+    "Liberal",
+    "Liberal",
+    "Progressive Conservative",
+    "Progressive Conservative",
+    "Progressive Conservative",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Conservative",
+    "Conservative",
+    "Conservative",
+    "Liberal",
+    "Liberal",
+    "Liberal",
+    "Liberal"
+  )
+)
+canadian_governments$color <- ifelse(
+  grepl("Conservative", canadian_governments$party),
+  "#002395", # Official Conservative blue
+  "#ED2E38"
+)
+
+```
+
+
+```{r k4_government_plot}
+k4_government_plot <- ggplot(
+  analysis_results$k_4$yearly_data,
+  aes(x = year, y = avg_gamma, color = label)
+) +
+  geom_line(linewidth = 1.4, alpha = 0.9) +
+  # Add government vertical lines
+  geom_vline(
+    xintercept = canadian_governments$year[grepl(
+      "Conservative",
+      canadian_governments$party
+    )],
+    color = "#002395",
+    alpha = 0.3,
+    linewidth = 0.8
+  ) +
+  geom_vline(
+    xintercept = canadian_governments$year[
+      canadian_governments$party == "Liberal"
+    ],
+    color = "#ED2E38",
+    alpha = 0.3,
+    linewidth = 0.8
+  ) +
+  scale_color_manual(values = analysis_results$k_4$color_map) +
+  facet_wrap(~label, scales = "free_y", ncol = 2) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    strip.text = element_text(size = 10, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    panel.spacing = unit(0.5, "cm"),
+    legend.position = "none"
+  ) +
+  labs(
+    title = "Policy Themes with Government Changes (Individual Topics)",
+    subtitle = "Blue lines = Conservative governments, Red lines = Liberal governments",
+    x = "Year",
+    y = "Topic Prominence (Gamma)"
+  )
+
+print(k4_government_plot)
+```
+
+
+
+```{r k8_government_plot}
+k8_government_plot <- ggplot(
+  analysis_results$k_8$yearly_data,
+  aes(x = year, y = avg_gamma, color = label)
+) +
+  geom_line(linewidth = 1.4, alpha = 0.9) +
+  # Add government vertical lines
+  geom_vline(
+    xintercept = canadian_governments$year[grepl(
+      "Conservative",
+      canadian_governments$party
+    )],
+    color = "#002395",
+    alpha = 0.3,
+    linewidth = 0.8
+  ) +
+  geom_vline(
+    xintercept = canadian_governments$year[
+      canadian_governments$party == "Liberal"
+    ],
+    color = "#ED2E38",
+    alpha = 0.3,
+    linewidth = 0.8
+  ) +
+  scale_color_manual(values = analysis_results$k_8$color_map) +
+  facet_wrap(~label, scales = "free_y", ncol = 2) +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+    strip.text = element_text(size = 10, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    panel.spacing = unit(0.5, "cm"),
+    legend.position = "none"
+  ) +
+  labs(
+    title = "Policy Themes with Government Changes (Individual Topics)",
+    subtitle = "Blue lines = Conservative governments, Red lines = Liberal governments",
+    x = "Year",
+    y = "Topic Prominence (Gamma)"
+  )
+
+print(k8_government_plot)
+```
+
+## Conclusion
+
+This topic modeling analysis of Canadian Speeches from the Throne reveals meaningful patterns in political discourse that align closely with historical events and governmental transitions. The 4-topic model demonstrates clear temporal succession, with Parliamentary Procedure & Administration dominating the early confederation period, followed by International Affairs & Defense during the world wars, Economic Development & Growth in the post-war boom, and Social Policy & Community Welfare in the modern era. The 8-topic model provides additional granularity, capturing the cyclical nature of themes like "War & International Relations" that resurge during different conflicts, and revealing how contemporary issues like Indigenous Affairs & Climate have gained prominence in recent decades. The validation against major historical events—from Confederation through both World Wars, the Great Depression, and the COVID-19 pandemic—confirms that these computational methods successfully identify genuine shifts in political priorities. 
+
+These findings demonstrate that unsupervised machine learning can effectively uncover the evolution of political discourse, providing quantitative evidence for how Canadian political priorities have shifted across nearly 160 years of parliamentary debate. The use of Speeches from the Throne as our corpus was particularly valuable, as these ceremonial addresses represent a standardized format delivered at consistent intervals, creating a reliable yardstick for measuring thematic changes over time. Unlike other parliamentary speeches that vary widely in context and purpose, Throne Speeches serve as an index of governmental priorities, allowing us to track shifts in political focus with greater precision and comparability across different eras and administrations.

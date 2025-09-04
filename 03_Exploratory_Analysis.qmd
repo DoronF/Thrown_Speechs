@@ -5,7 +5,7 @@ date: "August 20, 2025"
 format: 
   html:
     toc: true
-    toc-location: left
+    toc-location: right
     self-contained: true
     theme: cosmo
     code-overflow: wrap
@@ -150,4 +150,4 @@ Phrases like "house common" , "united states," and  "government work"   appear f
 
 **Note**: Lemmatization replaces words with their root form (e.g., “working” -> “work,” "governmental" -> "government"). This is why a phrase like “government work” appears frequently, as it captures many variations of the original phrasing.
 
-Next we identify boilerplate phrases by analyzing the ceremonial text.
+**Next Step:** [Boilerplate Identification →](04_Boilerplate_Identification.qmd)

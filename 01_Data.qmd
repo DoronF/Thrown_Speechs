@@ -1,0 +1,448 @@
+---
+title: "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+author: "Doron Feingold"
+date: "August 19, 2025"
+format: 
+  html:
+    toc: true
+    toc-location: right
+    self-contained: true
+    theme: cosmo
+    code-overflow: wrap
+
+---
+
+## Overview
+
+This document provides a complete, reproducible pipeline for creating a high-quality text corpus of Canadian Throne Speeches. The process involves scraping an index page from the Parliament of Canada website, programmatically processing downloadable PDFs using the Gemini 1.5 Vision model for high-quality OCR, and providing an interactive workflow to handle speeches that require manual extraction. The final output is a clean `throne_speeches` directory with text file for each speech, and a `speech_index.csv` file.
+
+---
+
+## Setup and Configuration
+
+First, we load the required R packages and configure the environment. This includes securely loading the API key and defining all the helper functions we'll need for scraping, transcribing, saving, and indexing the speeches.
+
+### Libraries
+```{r setup, message=FALSE, warning=FALSE, code_folding="none"}
+# Required Libraries
+library(rvest) # For web scraping
+library(dplyr) # For data manipulation
+library(stringr) # For text cleaning
+library(httr2) # For API requests and downloads
+library(pdftools) # To convert PDFs to images
+library(jsonlite) # To handle JSON
+library(base64enc) # To encode images
+library(purrr) # For functional programming
+library(readr) # For writing files
+library(clipr) # For using save from clipboard
+```
+
+### API Key and Output Directory
+
+```{r configuration, code_folding="none"}
+# --- API Key Configuration ---
+# The API key is loaded securely from an environment variable.
+GEMINI_API_KEY <- Sys.getenv("GEMINI_API_KEY")
+
+# --- Define Output Directory ---
+output_dir <- "output/throne_speeches_txt/"
+if (!dir.exists(output_dir)) {
+  dir.create(output_dir)
+}
+
+```
+
+## Functions
+Functions are all in a central R script to ensure uniformity across the different steps. Here we use the functions:
+
+* `scrape_throne_speech_links`: takes an html file or URL with the speech index and returns a dataframe with: `parliament`, `session`, `date` and `pdf_url`
+
+```{r scrape_throne_speech_links}
+# Web Scraping and OCR Functions
+scrape_throne_speech_links <- function(html_path) {
+  cat("Reading and scraping HTML file to find speeches...\n")
+  page <- read_html(html_path)
+  rows <- page %>% html_elements(".dx-datagrid-table tr[role='row']")
+  current_parliament <- NA
+
+  speeches_df <- map_dfr(rows, function(row) {
+    if (html_attr(row, "class") %>% str_detect("dx-group-row")) {
+      parliament_text <- row %>% html_element(".dx-group-cell") %>% html_text()
+      current_parliament <<- str_extract(parliament_text, "\\d+")
+      return(NULL)
+    }
+
+    if (html_attr(row, "class") %>% str_detect("dx-data-row")) {
+      cells <- row %>% html_elements("td")
+      session <- cells[[2]] %>% html_text()
+      journal_date_text <- cells[[3]] %>% html_text()
+      pdf_link_node <- cells[[5]] %>% html_element("a")
+
+      if (is.na(pdf_link_node)) {
+        return(NULL)
+      }
+
+      pdf_url <- pdf_link_node %>% html_attr("href")
+      speech_date <- str_extract(journal_date_text, "\\d{4}-\\d{2}-\\d{2}")
+
+      if (str_starts(pdf_url, "/")) {
+        pdf_url <- paste0("[https://lop.parl.ca](https://lop.parl.ca)", pdf_url)
+      }
+
+      tibble(
+        parliament = as.numeric(current_parliament),
+        session = as.numeric(session),
+        date = speech_date,
+        pdf_url = pdf_url
+      )
+    }
+  })
+
+  cat("Found", nrow(speeches_df), "speeches with document links.\n")
+  return(speeches_df %>% filter(!is.na(date)) %>% arrange(date))
+}
+```
+
+* `ocr_pdf_with_gemini`: The function converts the PDF files into high-resolution images and submits them to Gemini API with the following prompt:
+
+> "This image is a page from a bilingual historical document, with    English and French text often in separate columns. Please transcribe ONLY THE ENGLISH TEXT from the page. Ignore the French text completely. Also, ignore page numbers, headers, and footers. Preserve the original paragraph breaks from the English text."
+
+
+```{r ocr_pdf_with_gemini}
+#' Transcribes text from a PDF file using the Gemini Vision API.
+ocr_pdf_with_gemini <- function(pdf_path, api_key) {
+  cat("Step 1: Converting PDF to high-resolution images...\n")
+  image_files <- tryCatch(
+    {
+      pdftools::pdf_convert(pdf_path, format = 'png', dpi = 300)
+    },
+    error = function(e) {
+      cat("ERROR: pdftools failed to convert", basename(pdf_path), "\n")
+      return(NULL)
+    }
+  )
+
+  if (is.null(image_files)) {
+    return("Error: PDF conversion failed.")
+  }
+
+  on.exit(file.remove(image_files), add = TRUE)
+
+  cat(
+    "Step 2: Sending",
+    length(image_files),
+    "pages to Gemini for transcription...\n"
+  )
+
+  text_from_pages <- map_chr(image_files, function(img_file) {
+    encoded_image <- base64enc::base64encode(img_file)
+    url <- "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+
+    prompt <- "This image is a page from a bilingual historical document, with English and French text often in separate columns. Please transcribe ONLY THE ENGLISH TEXT from the page. Ignore the French text completely. Also, ignore page numbers, headers, and footers. Preserve the original paragraph breaks from the English text."
+
+    req_body <- list(
+      contents = list(
+        list(
+          parts = list(
+            list(text = prompt),
+            list(
+              inline_data = list(
+                mime_type = "image/png",
+                data = encoded_image
+              )
+            )
+          )
+        )
+      ),
+      safetySettings = list(
+        list(category = "HARM_CATEGORY_HARASSMENT", threshold = "BLOCK_NONE"),
+        list(category = "HARM_CATEGORY_HATE_SPEECH", threshold = "BLOCK_NONE"),
+        list(
+          category = "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold = "BLOCK_NONE"
+        ),
+        list(
+          category = "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold = "BLOCK_NONE"
+        )
+      )
+    )
+
+    resp <- tryCatch(
+      {
+        request(url) %>%
+          req_url_query(key = api_key) %>%
+          req_body_json(req_body) %>%
+          req_timeout(90) %>%
+          req_perform()
+      },
+      error = function(e) {
+        cat(
+          "NETWORK ERROR on page:",
+          basename(img_file),
+          "-",
+          e$message,
+          "\n"
+        )
+        return(NULL)
+      }
+    )
+
+    if (is.null(resp)) {
+      return(paste("Error: Network failure on page", basename(img_file)))
+    }
+
+    if (resp_status(resp) == 200) {
+      body <- resp_body_json(resp)
+      if (!is.null(body$candidates) && length(body$candidates) > 0) {
+        text_response <- body$candidates[[1]]$content$parts[[1]]$text
+        if (!is.null(text_response)) {
+          return(text_response)
+        }
+      }
+      reason <- body$promptFeedback$blockReason %||% "No text in response"
+      cat(
+        "WARNING: API returned OK but no content for page:",
+        basename(img_file),
+        "Reason:",
+        reason,
+        "\n"
+      )
+      return(paste("Error: No text returned for page", basename(img_file)))
+    } else {
+      cat(
+        "API ERROR on page:",
+        basename(img_file),
+        "- Status:",
+        resp_status(resp),
+        "\n"
+      )
+      return(paste("Error: API returned status", resp_status(resp)))
+    }
+  })
+
+  cat("Step 3: Assembling and cleaning the final text...\n")
+
+  final_text <- paste(text_from_pages, collapse = "\n\n") %>%
+    str_replace_all("Error: [[:print:]]+", "") %>%
+    str_replace_all("\\s*\\r?\\n\\s*", " ") %>%
+    str_replace_all("\\s+", " ") %>%
+    str_trim()
+
+  return(final_text)
+}
+```
+
+* `save_speech`: is used by `ocr_pdf_with_gemini` to save and index the speeches. It takes in the speech text, date and parliament number to be included in a metadata header:
+
+```{txt , code_folding = "none"}
+# THRONE SPEECH METADATA
+# Date: 1950-02-16
+# Parliament: 21
+# File created: 2025-08-20
+# =====================================
+
+A.D. 1950 16TH FEBRUARY 3 IN TESTIMONY WHEREOF We have caused these Our Letters to be made Patent and the Great Seal of Canada to be hereunto affixed. WITNESS: Our Right Trusty and Well-beloved Cousin, ...
+```
+
+See the original [PDF](https://lop.parl.ca/staticfiles/ParlInfo/Documents/ThroneSpeech/En/21-02-e.pdf)
+
+![This is a screenshot of a PDF document.](data/pdf_screenshot.png)
+
+```{r}
+source("R/functions.R")
+```
+
+-----
+
+## Automated Corpus Regeneration
+
+This block runs the automated part of the process. It scrapes the HTML, then loops through all the direct PDF links to download and transcribe them, using the shared `save_speech` function.
+
+**Note:** The following code chunk is set to `eval=FALSE`. To run the automated regeneration, change the chunk option to `{r run-automated-process, eval=TRUE}` and execute it.
+
+```{r run-automated-process, eval=FALSE}
+# Scrape the HTML file to get the list of speeches
+html_file <- "data/throne_speeches_raw/Speeches from the Throne.html"
+all_speeches <- scrape_throne_speech_links(html_file)
+
+skipped_speeches <- tibble()
+
+# Loop through and process all direct PDF links
+for (i in 1:nrow(all_speeches)) {
+  speech_info <- all_speeches[i, ]
+  cat(paste0(
+    "Evaluating speech ",
+    i,
+    " of ",
+    nrow(all_speeches),
+    ": ",
+    speech_info$date,
+    "\n"
+  ))
+
+  is_pdf_link <- str_ends(speech_info$pdf_url, "\\.pdf")
+
+  if (is_pdf_link) {
+    temp_pdf_path <- tempfile(fileext = ".pdf")
+
+    tryCatch(
+      {
+        cat("Link is a PDF. Downloading from:", speech_info$pdf_url, "\n")
+        request(speech_info$pdf_url) %>%
+          req_perform(path = temp_pdf_path)
+
+        # Run the OCR function
+        final_text <- ocr_pdf_with_gemini(temp_pdf_path, GEMINI_API_KEY)
+
+        if (!is.null(final_text) && nchar(final_text) > 0) {
+          save_speech(
+            speech_text = final_text,
+            date = speech_info$date,
+            parliament = speech_info$parliament,
+            base_dir = output_dir
+          )
+        } else {
+          cat(
+            "WARNING: OCR failed or returned empty text for",
+            speech_info$date,
+            "\n"
+          )
+        }
+      },
+      error = function(e) {
+        cat(
+          "ERROR: Failed to process",
+          speech_info$date,
+          ". Error:",
+          e$message,
+          "\n"
+        )
+      }
+    )
+    if (file.exists(temp_pdf_path)) {
+      file.remove(temp_pdf_path)
+    }
+  } else {
+    cat(
+      "SKIPPING: Link is not a direct PDF. Adding to manual review list.\n"
+    )
+    cat("URL:", speech_info$pdf_url, "\n")
+
+    skipped_speeches <- skipped_speeches %>%
+      bind_rows(
+        tibble(
+          parliament = speech_info$parliament,
+          session = speech_info$session,
+          date = speech_info$date,
+          skipped_url = speech_info$pdf_url,
+          reason = "Not a direct .pdf link"
+        )
+      )
+  }
+  Sys.sleep(1)
+}
+
+# Save the list of skipped speeches to a CSV file
+if (nrow(skipped_speeches) > 0) {
+  write_csv(skipped_speeches, "_skipped_for_manual_review.csv")
+  cat(
+    "\nATTENTION: A list of skipped speeches was saved to '_skipped_for_manual_review.csv'\n"
+  )
+}
+
+# Create the index for all automatically processed speeches
+create_speech_index(base_dir = output_dir)
+
+cat("Automated corpus regeneration complete!\n")
+```
+
+-----
+
+## Processing Skipped Speeches
+
+Since recent speeches are no longer in the form of scanned PDFs, we skipped them in the previous step and produced a `_skipped_for_manual_review.csv` file.  
+
+### Processing Exceptional Speech 
+The speech from 1989, 3rd session of the 34th Parliament, is a bit tricky. It is in the form of an interactive pdf viewer which lets you view one page at a time. I ended up downloading the complete PDF ("print"/save as PDF) from a pdf reader and only "printing" the pages with the speech. The pdf is included in the data folder and can be processed by passing it to `ocr_pdf_with_gemini` and `save_speech` for processing uniformity.  
+
+```{r 34_03_pdf, eval=FALSE}
+pdf <- "data/throne_speeches_raw/pdf/34_03.pdf"
+
+text <- ocr_pdf_with_gemini(pdf, GEMINI_API_KEY)
+
+save_speech(
+  speech_text = text,
+  date = "1991-05-13",
+  parliament = 34
+)
+```
+
+
+### Interactive Processing
+The code in the next cell will prompt you in the R console to manually copy the text for each of the remaining speeches. A URL for each speech is provided for convenience. Following the URL lets you select and copy the speech to the clipboard (Ctrl+C) and then simply hit Enter in the R console. 
+
+**Note:** This chunk must be run **interactively in the R console**. It will not work when rendering the document.
+
+```{r run-interactive-process, eval=FALSE}
+## INTERACTIVE SESSION FOR SKIPPED SPEECHES
+skipped_file <- "_skipped_for_manual_review.csv"
+
+if (file.exists(skipped_file)) {
+  skipped_df <- read_csv(skipped_file, show_col_types = FALSE)
+
+  if (nrow(skipped_df) > 0) {
+    cat(
+      "Starting interactive session to process",
+      nrow(skipped_df),
+      "skipped speeches.\n"
+    )
+
+    for (i in 1:nrow(skipped_df)) {
+      speech_info <- skipped_df[i, ]
+
+      #  Instructions for the user
+      cat("\n--------------------------------------------------\n")
+      cat("--- PROCESSING SKIPPED SPEECH", i, "of", nrow(skipped_df), "---\n")
+      cat("          Date:", speech_info$date, "\n")
+      cat("    Parliament:", speech_info$parliament, "\n\n")
+      cat("1. Open this URL in your browser:\n")
+      cat("  ", speech_info$skipped_url, "\n\n")
+      cat("2. Manually select and copy ONLY the text of the speech itself.\n\n")
+
+      readline(
+        prompt = "After copying the text, return here and press [Enter] to continue..."
+      )
+
+      # Read the text vector directly from the system clipboard
+      speech_text_vector <- clipr::read_clip()
+
+      if (!is.null(speech_text_vector) && length(speech_text_vector) > 0) {
+        speech_text_single_string <- paste(speech_text_vector, collapse = " ")
+
+        # Use the existing save_speech function with the single string
+        save_speech(
+          speech_text = speech_text_single_string,
+          date = speech_info$date,
+          parliament = speech_info$parliament
+        )
+      } else {
+        cat("\nClipboard is empty. Skipping this speech.\n")
+      }
+    }
+    cat("\nInteractive session complete.\n")
+  } else {
+    cat("The skipped speeches file is empty. Nothing to process.\n")
+  }
+} else {
+  cat("No '_skipped_for_manual_review.csv' file found. Nothing to do.\n")
+}
+
+```
+
+## Conclusion
+The above process produces a folder with text files for each speech and an index file for future processing. 
+
+In the next step, we segment the speeches using Gemini LLM to classify sentences as part of: `opening_ceremonial`, `policy_content`, `closing_ceremonial` and `unclassified`. 
+
+**Next Step:** [Segmentation of Throne Speeches using Gemini LLM →](02_Segmentation.qmd)

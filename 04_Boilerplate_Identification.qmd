@@ -5,7 +5,7 @@ date: "August 20, 2025"
 format: 
   html:
     toc: true
-    toc-location: left
+    toc-location: right
     self-contained: true
     theme: cosmo
     code-overflow: wrap
@@ -322,18 +322,4 @@ saveRDS(
 
 The dictionary successfully removes the target phrases, demonstrating its utility for future analysis phases where we need to isolate purely policy-related text. 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**Next Step:** [LDA Topic Extraction and Analysis →](05_Topics_Extraction.qmd)
