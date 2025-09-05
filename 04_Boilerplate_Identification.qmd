@@ -25,7 +25,7 @@ This process involves:
 
 ----
 
-## 1. Setup and Data Preparation
+## Setup and Data Preparation
 
 First, we load the necessary libraries and the clean, segmented corpus. We'll then create a dedicated corpus containing only the ceremonial text for our analysis.
 
@@ -53,7 +53,7 @@ ceremonial_corpus <- clean_corpus %>%
 total_docs <- nrow(ceremonial_corpus)
 ```
 
-## 1.1 Stopwords 
+## Stopwords 
 Stopwords are commonly removed during text preprocessing because they appear frequently across documents but carry little semantic meaning that distinguishes one text from another - words like "the," "and," "is," and "of" typically don't contribute to understanding the core topics or sentiment of a document. The `get_project_stopwords` function combines a standard set of stopwords (`tidytext::get_stopwords()`), with custom ones that appear with high frequency in throne speeches but don't help us identify topics. 
 ```{r stopwords, echo = FALSE}
 cat("Custom Stopwords: \n")
@@ -67,7 +67,7 @@ stopword_regex <- paste0(
 )
 ```
 
-## 2. A Unified Analysis of Phrase Proportionality
+## A Unified Analysis of Phrase Proportionality
 
 To create a robust boilerplate dictionary, we will analyze n-grams from both ceremonial and policy texts simultaneously. We will identify phrases that are both highly pervasive across all speeches and disproportionately found in ceremonial sections. We do so using `analyze_ceremony_ngrams` function which takes in the size of the n-gram" (number of words), in our case 2 and 3, the corpora and the stopwords regex, we prepared at the beginning, and returns a summary dataset comparing n-gram usage. 
 The table below, shows the top 12 n-grams.
@@ -113,7 +113,7 @@ all_ngrams_summary %>%
   )
 ```
 
-## 3. Creating the Dictionary 
+## Creating the Dictionary 
 With these thresholds clearly defined, creating the dictionary is a simple, justifiable filtering step.
 
 ```{r create-intrusion-dictionary}
@@ -132,24 +132,6 @@ intrusion_dictionary_df <- all_ngrams_summary %>%
   # Sort by n-gram size (longest first) to handle overlaps
   arrange(desc(n_size))
 
-# add custom phrases that are obvious but may not be common enough in the ceremonial text
-custom_phrases_df <- tibble(
-  ngram = c(
-    "honourable gentlemen of the senate",
-    "gentlemen of the house of commons"
-  )
-) %>%
-  # Add the n_size column so we can sort correctly
-  mutate(n_size = str_count(ngram, "\\w+"))
-
-intrusion_dictionary_df <- bind_rows(
-  intrusion_dictionary_df,
-  custom_phrases_df
-) %>%
-  distinct(ngram, .keep_all = TRUE) %>%
-  # Sort by n-gram size (longest first) to handle overlaps
-  arrange(desc(n_size))
-
 # Create the final regex from the sorted ngram column
 intrusion_regex <- paste(intrusion_dictionary_df$ngram, collapse = "|")
 ```
@@ -164,7 +146,7 @@ knitr::kable(head(intrusion_dictionary_df, 12))
 
 ```
 
-## 4. Applying the Dictionary to Filter Policy Content
+## Applying the Dictionary to Filter Policy Content
 
 Finally, we can demonstrate how to use this dictionary to filter these ceremonial phrases out of the policy_content section, as described in step 2.3 of the plan. This leaves a cleaner text for deeper thematic analysis later.
 
@@ -298,7 +280,7 @@ ggplot(decade_impact_summary, aes(x = Decade, group = 1)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-## 5. Save Intrusion Dictionary & Regex
+## Save Intrusion Dictionary & Regex
 * Saving `intrusion_dictionary.csv`, dictionary phrases as a CSV for easy inspection.
 * Saving `intrusion_regex.rds`, regex string as an RDS file for efficient use in R.
 
@@ -318,7 +300,7 @@ saveRDS(
 ```
 
 
-## 6. Conclusion 
+## Conclusion 
 
 The dictionary successfully removes the target phrases, demonstrating its utility for future analysis phases where we need to isolate purely policy-related text. 
 

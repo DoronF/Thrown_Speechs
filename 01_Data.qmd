@@ -23,7 +23,9 @@ This document provides a complete, reproducible pipeline for creating a high-qua
 First, we load the required R packages and configure the environment. This includes securely loading the API key and defining all the helper functions we'll need for scraping, transcribing, saving, and indexing the speeches.
 
 ### Libraries
-```{r setup, message=FALSE, warning=FALSE, code_folding="none"}
+```{r setup, message=FALSE, warning=FALSE}
+#| code-fold: false
+
 # Required Libraries
 library(rvest) # For web scraping
 library(dplyr) # For data manipulation
@@ -39,7 +41,9 @@ library(clipr) # For using save from clipboard
 
 ### API Key and Output Directory
 
-```{r configuration, code_folding="none"}
+```{r configuration}
+#| code-fold: false
+
 # --- API Key Configuration ---
 # The API key is loaded securely from an environment variable.
 GEMINI_API_KEY <- Sys.getenv("GEMINI_API_KEY")
@@ -235,19 +239,18 @@ ocr_pdf_with_gemini <- function(pdf_path, api_key) {
 
 * `save_speech`: is used by `ocr_pdf_with_gemini` to save and index the speeches. It takes in the speech text, date and parliament number to be included in a metadata header:
 
-```{txt , code_folding = "none"}
-# THRONE SPEECH METADATA
-# Date: 1950-02-16
-# Parliament: 21
-# File created: 2025-08-20
-# =====================================
 
-A.D. 1950 16TH FEBRUARY 3 IN TESTIMONY WHEREOF We have caused these Our Letters to be made Patent and the Great Seal of Canada to be hereunto affixed. WITNESS: Our Right Trusty and Well-beloved Cousin, ...
-```
+> \# THRONE SPEECH METADATA  
+> \# Date: 1950-02-16  
+> \# Parliament: 21  
+> \# File created: 2025-08-20  
+> \# =====================================
+>
+>  A.D. 1950 16TH FEBRUARY 3 IN TESTIMONY WHEREOF We have caused these Our Letters to be made Patent and the Great Seal of Canada to be hereunto affixed. WITNESS: Our Right Trusty and Well-beloved Cousin, ...
 
 See the original [PDF](https://lop.parl.ca/staticfiles/ParlInfo/Documents/ThroneSpeech/En/21-02-e.pdf)
 
-![This is a screenshot of a PDF document.](data/pdf_screenshot.png)
+![screenshot of the PDF document.](data/pdf_screenshot.png)
 
 ```{r}
 source("R/functions.R")

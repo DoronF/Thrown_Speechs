@@ -19,7 +19,7 @@ This document performs an initial exploratory data analysis (EDA) on the segment
 
 ---
 
-## 1. Setup 
+## Setup 
 
 First, we load the required libraries for data manipulation, text analysis, and visualization. 
 
@@ -37,7 +37,7 @@ library(scales)
 source("R/functions.R")
 ```
 
-## 2. Data Loading
+## Data Loading
 We then load the segmented corpus and summary files created in the previous step.
 ```{r data}
 # Load the pre-processed data from the segmentation step
@@ -74,7 +74,7 @@ analytical_corpus <- speeches_df %>%
 
 ```
 
-## 3. Basic Text Statistics by Decade
+## Basic Text Statistics by Decade
 Let's start by looking at some high-level statistics to see how the speeches have changed over time. We can examine the number of speeches and their average length by decade. Here, we'll focus on the word count of the policy_content section, as this is the core of the speech. 
 
 **Note**: The first speech was given in 1867.
@@ -107,7 +107,7 @@ decade_summary %>%
 
 This initial view shows how the substantive policy portion of the speeches has grown considerably over time, peaking in the mid-to-late 20th century.
 
-## 4. Word Frequency Analysis
+## Word Frequency Analysis
 Now, let's identify the most common words used in the policy_content of the speeches. This helps us understand the core vocabulary.
 
 ```{r ,echo=FALSE}
@@ -135,7 +135,7 @@ top_words %>%
 
 Words like "government," "canada," and "development" are, unsurprisingly, common, reflecting the nature of these speeches.
 
-## 4. N-gram Analysis
+## N-gram Analysis
 Word frequencies are useful, but context is often lost. N-grams are sequences of N words, which help us find commonly repeated phrases. Let's look at bigrams (2-word phrases) to see what concepts often appear together.
 
 ```{r ,echo=FALSE}

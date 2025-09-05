@@ -126,19 +126,19 @@ tokenize_speeches <- function(speeches_df, log_file) {
 ## Interacting with the Gemini API
 `process_speech_with_gemini` is the core of this stage, where we communicate with the Gemini LLM the following prompt:
 
-```{txt prompt, code_folding="none"}
-"Segment this full throne speech into three sections:
-1. OPENING_CEREMONIAL: Formal protocol, addresses, historical acknowledgments, and introductory remarks (typically the first few paragraphs).
-2. POLICY_CONTENT: Specific government agendas, commitments, and policy details (the bulk, often starting with phrases like "Our Government will..." or "My Government will...").
-3. CLOSING_CEREMONIAL: Formal conclusion, blessings, or prorogation notes (typically the last paragraph).
-Provide the output as a JSON object with keys:
-  - sections: An object with keys 'opening_ceremonial', 'policy_content', 'closing_ceremonial', each containing:
-  - start_sentence_id: Integer (1-based)
-  - end_sentence_id: Integer (1-based)
-  - transition_markers: Array of strings (any identified transition phrases, e.g., "Honourable Senators", "My Government will", "May Divine Providence")
 
-Ensure the output is ONLY a single, valid JSON object with no extra text or formatting.
-```
+> Segment this full throne speech into three sections:  
+> 1. OPENING_CEREMONIAL: Formal protocol, addresses, historical acknowledgments, and introductory remarks (typically the first few paragraphs).  
+> 2. POLICY_CONTENT: Specific government agendas, commitments, and policy details (the bulk, often starting with phrases like "Our Government will..." or "My Government will...").  
+> 3. CLOSING_CEREMONIAL: Formal conclusion, blessings, or prorogation notes (typically the last paragraph).  
+> Provide the output as a JSON object with keys:  
+> - sections: An object with keys 'opening_ceremonial', 'policy_content', 'closing_ceremonial', each containing:  
+> - start_sentence_id: Integer (1-based)  
+> - end_sentence_id: Integer (1-based)  
+> - transition_markers: Array of strings (any identified transition phrases, e.g., "Honourable Senators", "My Government will", "May Divine Providence")
+>
+> Ensure the output is ONLY a single, valid JSON object with no extra text or formatting.
+
 
 
 ### The Main Processing Loop
@@ -421,7 +421,7 @@ generate_segmented_outputs <- function(segmented_data, log_file) {
 
 ```
 
-### 3.5: Execution
+### Execution
 This is the main execution block that runs the entire process from start to finish. The functions defined in the previous steps are called in logical order.
 
 **Note**: This code chunk is set to `eval=FALSE` by default to prevent it from automatically running when you render the document.
@@ -512,7 +512,7 @@ results <- main(
 
 ***
 
-## 4. Interactive Review of Identified Issues
+## Interactive Review of Identified Issues
 An interactive tool to review and correct LLM-based speech segmentations. The script loops through the speeches identified and recorded in llm_issues.csv. The screenshot below illustrates the options available.
 
 
