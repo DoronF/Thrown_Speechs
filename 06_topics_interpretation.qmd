@@ -16,11 +16,14 @@ This document uses a Large Language Model (LLM) to interpret the topics generate
 
 For this task, we selected Anthropic's Claude model, which has a reputation for nuanced cultural and historical interpretation. We'll use its API to interpret the topics from each of our k models, providing it with the highest-probability words (ranked by their beta values) for each topic.
 
-## 1. Setup
+## Setup
 
 First, we load the necessary libraries and data.
 
 ```{r setup, message=FALSE, warning=FALSE, echo = TRUE}
+# Seed
+set.seed(1867)
+
 # Load libraries
 library(dplyr)
 library(tidytext)
@@ -45,7 +48,7 @@ k_values <- c(4, 8)
 ANTHROPIC_API_KEY <- Sys.getenv("ANTHROPIC_API_KEY")
 ```
 
-## 2. Prompt Engineering for Interpretation
+## Prompt Engineering for Interpretation
 We create a new function `interpret_topic_set_with_llm` that formats the top words from all topics in a model into a single prompt. The prompt instructs the LLM to return a JSON array, with one object for each topic's interpretation.
 
 ### Prompt:
@@ -67,7 +70,7 @@ Each element should be an object with these three keys:
 Return only the JSON array, starting with [ and ending with ]:
 ```
 
-## 3. Iteratively Interpret Each Topic Set
+## Iteratively Interpret Each Topic Set
 Now we'll loop through each model, making a call using `interpret_topic_set_with_llm`, and parse the JSON array result.
 
 **Note**: To reproduce this part you must have an API key with Anthropic. It is not free but $5 credit (the minimum amount) should be enough. Running this loop several times during testing, cost about $0.15. It should not be hard to convert the function to another LLM if cost is an issue.

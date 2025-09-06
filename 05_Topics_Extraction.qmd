@@ -16,10 +16,13 @@ execute:
 ## Overview
 LDA (Latent Dirichlet Allocation) is a probabilistic topic modeling technique that discovers hidden thematic structures in large collections of text documents. It assumes each document is a mixture of topics, and each topic is characterized by a distribution of words, allowing it to automatically identify and extract meaningful topics from unstructured text data. The model requires us to select the number of topics beforehand. Since it is unknown to us which number of topics is right, we train several LDA models with different numbers of topics (`k`). We then evaluate, compare and rank all the models', topic quality and temporal balance. Finally we choose which number of topics is best overall. 
 
-## 1. Setup
+## Setup
 We load packages, most notably we load `topicmodels` for training the LDA models.
 we also load our `project_stopwords` and `intrusion_regex` (boilerplate), we established in the previous step.
 ```{r setup, message=FALSE, warning=FALSE, echo = TRUE}
+# Seed
+set.seed(1867)
+
 # Load all necessary libraries
 library(dplyr)
 library(tidytext)
@@ -44,7 +47,7 @@ project_stopwords <- get_project_stopwords()
 k_values <- c(4, 6, 8, 10, 12)
 ```
 
-## 2. Pre-Processing
+## Pre-Processing
 
 We prepare the text and create a single Document-Term Matrix (DTM) using `tidytext`.
 
@@ -67,7 +70,7 @@ dtm_tm <- lemmatized_policy_words %>%
   cast_dtm(filename, lemma, n)
 ```
 
-## 3. Iterative LDA Topic Modeling
+## Iterative LDA Topic Modeling
 
 We now train a separate LDA model for each `k` value `k_values <- c(4, 6, 8, 10, 12)`.
 
@@ -82,7 +85,7 @@ toc()
 saveRDS(lda_models, "output/models/lda_models.rds")
 ```
 
-## 4. Model Results and Analysis
+## Model Results and Analysis
 To evaluate the results we review the following:  
 
 * **Topic Distribution by Era**: Are the topics evenly distributed across the eras?
@@ -325,7 +328,7 @@ dominance_plots <- purrr::map(individual_plots_list, ~ .x$dominance)
 era_bar_plots <- purrr::map(individual_plots_list, ~ .x$era_bar)
 ```
 
-### 4.1 **Topic Distribution by Era**
+### **Topic Distribution by Era**
 We can see how many topics peaked in each era: 
 
 * **Pre-War** 1867 - 1940
@@ -424,7 +427,7 @@ Most even distribution: k = **`r most_even_k`**
 
 ***
 
-### 4.2 **Topic Prominence Over Time**
+### **Topic Prominence Over Time**
 
 This plot compares the topic prominence line charts for each `k` value. A good model should show distinct and interpretable trend lines.
 
@@ -579,7 +582,7 @@ knitr::kable(combined_ranking)
 ---
 
 
-### 4.3 Topic Quality: Dominance vs. Exclusivity
+### Topic Quality: Dominance vs. Exclusivity
 This plot compares topic dominance (how often a topic is the primary theme of a speech) with exclusivity. This helps identify which topics are both important and unique.
 
 #### **Dominance Plot**

@@ -29,6 +29,9 @@ LLMs are very good but not perfect, so we will break the process into 2 stages:
 
 ### Loading Libraries
 ```{r setup, message=FALSE, warning=FALSE}
+# Seed
+set.seed(1867)
+
 # Required Libraries
 library(dplyr) # Data manipulation
 library(tidytext) # Text preprocessing and tokenization

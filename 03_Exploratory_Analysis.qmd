@@ -24,6 +24,8 @@ This document performs an initial exploratory data analysis (EDA) on the segment
 First, we load the required libraries for data manipulation, text analysis, and visualization. 
 
 ```{r setup, message=FALSE, warning=FALSE}
+set.seed(1867)
+
 # Data Manipulation and Analysis
 library(dplyr)
 library(tidytext)

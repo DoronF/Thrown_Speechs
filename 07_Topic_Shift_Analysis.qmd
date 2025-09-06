@@ -48,6 +48,8 @@ For each topic, count how many of its top 15 words are not in the top 15 words o
 **Interpretation**: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.
 
 ```{r setup, message=FALSE, warning=FALSE}
+# Seed
+set.seed(1867)
 
 # Load libraries
 library(dplyr)

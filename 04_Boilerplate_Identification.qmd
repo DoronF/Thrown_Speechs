@@ -1,7 +1,7 @@
 ---
 title: "Boilerplate Identification"
 author: "Doron Fingold"
-date: "August 20, 2025"
+date: "today"
 format: 
   html:
     toc: true
@@ -73,7 +73,7 @@ To create a robust boilerplate dictionary, we will analyze n-grams from both cer
 The table below, shows the top 12 n-grams.
 
 
-```{r unified-multigram-analysis, cache=TRUE}
+```{r unified-multigram-analysis}
 
 #  Run the Analysis for N=2, 3
 all_ngrams_summary <- purrr::map_dfr(
@@ -115,6 +115,9 @@ all_ngrams_summary %>%
 
 ## Creating the Dictionary 
 With these thresholds clearly defined, creating the dictionary is a simple, justifiable filtering step.
+
+- Lower `PERVASIVENESS_THRESHOLD` includes rarer phrases.
+- Lower `PROPORTIONALITY_THRESHOLD` includes phrases that are less purely ceremonial.
 
 ```{r create-intrusion-dictionary}
 # - Lower PERVASIVENESS_THRESHOLD to include rarer phrases.
