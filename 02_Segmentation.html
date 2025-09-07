@@ -3892,7 +3892,7 @@ vertical-align: -.125em;
  <span class="dropdown-text">LDA Topic Modeling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_topics_interpretation.html">
+    <a class="dropdown-item" href="./06_Topics_Interpretation.html">
  <span class="dropdown-text">LLM Topic Interpretation</span></a>
   </li>  
         <li>
@@ -4000,7 +4000,7 @@ vertical-align: -.125em;
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./06_topics_interpretation.html" class="sidebar-item-text sidebar-link">
+  <a href="./06_Topics_Interpretation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LLM Interpretation of Topic Models</span></a>
   </div>
 </li>
@@ -4106,15 +4106,18 @@ vertical-align: -.125em;
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Required Libraries</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># Data manipulation</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext) <span class="co"># Text preprocessing and tokenization</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2) <span class="co"># For API requests</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite) <span class="co"># For JSON handling</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># For reading/writing CSV</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr) <span class="co"># For functional programming</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) <span class="co"># For string operations</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crayon) <span class="co"># colouring Interactive Console</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seed</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1867</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Required Libraries</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># Data manipulation</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidytext) <span class="co"># Text preprocessing and tokenization</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2) <span class="co"># For API requests</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite) <span class="co"># For JSON handling</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># For reading/writing CSV</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr) <span class="co"># For functional programming</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) <span class="co"># For string operations</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crayon) <span class="co"># colouring Interactive Console</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Loading functions and setting up environment variables.</p>
@@ -4129,7 +4132,7 @@ vertical-align: -.125em;
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">log_message</span>(<span class="st">&quot;Starting throne speech segmentation script&quot;</span>, log_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[2025-09-06 15:32:10] Starting throne speech segmentation script </code></pre>
+<pre><code>[2025-09-07 15:36:24] Starting throne speech segmentation script </code></pre>
 </div>
 <details class="code-fold">
 <summary>Show code</summary>
@@ -4608,7 +4611,7 @@ Provide the output as a JSON object with keys:<br>
 <p>An interactive tool to review and correct LLM-based speech segmentations. The script loops through the speeches identified and recorded in llm_issues.csv. The screenshot below illustrates the options available.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img role="img" src="data/Segmentation_Prompt.png" class="img-fluid figure-img"></p>
+<p><img role="img" src="figures/Segmentation_Prompt.png" class="img-fluid figure-img"></p>
 <figcaption>Screenshot of the main menu for the interactive console review script below</figcaption>
 </figure>
 </div>
@@ -4701,7 +4704,7 @@ Provide the output as a JSON object with keys:<br>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/DoronF\.github\.io\/Thrown_Speechs\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

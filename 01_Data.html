@@ -3892,7 +3892,7 @@ vertical-align: -.125em;
  <span class="dropdown-text">LDA Topic Modeling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_topics_interpretation.html">
+    <a class="dropdown-item" href="./06_Topics_Interpretation.html">
  <span class="dropdown-text">LLM Topic Interpretation</span></a>
   </li>  
         <li>
@@ -4000,7 +4000,7 @@ vertical-align: -.125em;
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./06_topics_interpretation.html" class="sidebar-item-text sidebar-link">
+  <a href="./06_Topics_Interpretation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LLM Interpretation of Topic Models</span></a>
   </div>
 </li>
@@ -4095,17 +4095,19 @@ vertical-align: -.125em;
 <section id="libraries" class="level3">
 <h3 class="anchored" data-anchor-id="libraries">Libraries</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Required Libraries</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest) <span class="co"># For web scraping</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># For data manipulation</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) <span class="co"># For text cleaning</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2) <span class="co"># For API requests and downloads</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pdftools) <span class="co"># To convert PDFs to images</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite) <span class="co"># To handle JSON</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(base64enc) <span class="co"># To encode images</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr) <span class="co"># For functional programming</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># For writing files</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clipr) <span class="co"># For using save from clipboard</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1867</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Required Libraries</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rvest) <span class="co"># For web scraping</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># For data manipulation</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr) <span class="co"># For text cleaning</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(httr2) <span class="co"># For API requests and downloads</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pdftools) <span class="co"># To convert PDFs to images</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite) <span class="co"># To handle JSON</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(base64enc) <span class="co"># To encode images</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr) <span class="co"># For functional programming</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># For writing files</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clipr) <span class="co"># For using save from clipboard</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="api-key-and-output-directory" class="level3">
@@ -4324,7 +4326,7 @@ vertical-align: -.125em;
 <p>See the original <a href="https://lop.parl.ca/staticfiles/ParlInfo/Documents/ThroneSpeech/En/21-02-e.pdf">PDF</a></p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img role="img" src="data/pdf_screenshot.png" class="img-fluid figure-img"></p>
+<p><img role="img" src="figures/pdf_screenshot.png" class="img-fluid figure-img"></p>
 <figcaption>screenshot of the PDF document.</figcaption>
 </figure>
 </div>
@@ -4606,7 +4608,7 @@ vertical-align: -.125em;
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/DoronF\.github\.io\/Thrown_Speechs\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
