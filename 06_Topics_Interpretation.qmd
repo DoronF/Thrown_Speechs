@@ -63,22 +63,21 @@ We create a new function `interpret_topic_set_with_llm` that formats the top wor
 
 ### Prompt:
 
-```{txt}
-You are an expert political historian specializing in Canadian policy. 
-I have a set of {k_value} topics from a topic model of Canadian Throne Speeches. 
-Your task is to provide a concise interpretation for EACH topic based on its most probable words, considering the context of the other topics.
+>You are an expert political historian specializing in Canadian policy. 
+>I have a set of {k_value} topics from a topic model of Canadian Throne Speeches. 
+>Your task is to provide a concise interpretation for EACH topic based on its most probable words, considering the context of the other topics.
+>
+>Here is the full set of topics and their words: {topics_words}
+>
+>Please provide your response as a valid JSON array (and ONLY the JSON array, no markdown formatting or extra text). 
+>
+>Each element should be an object with these three keys:
+>1. 'topic_id': The integer topic number.
+>2. 'label': A short, descriptive topic label of 3-5 words (e.g., 'National Defense & Foreign Affairs').
+>3. 'focus': A single sentence describing the policy area this topic represents.
+>
+>Return only the JSON array, starting with [ and ending with ]:
 
-Here is the full set of topics and their words: {topics_words}
-
-Please provide your response as a valid JSON array (and ONLY the JSON array, no markdown formatting or extra text). 
-
-Each element should be an object with these three keys:
-1. 'topic_id': The integer topic number.
-2. 'label': A short, descriptive topic label of 3-5 words (e.g., 'National Defense & Foreign Affairs').
-3. 'focus': A single sentence describing the policy area this topic represents.
-
-Return only the JSON array, starting with [ and ending with ]:
-```
 
 ## Iteratively Interpret Each Topic Set
 Now we'll loop through each model, making a call using `interpret_topic_set_with_llm`, and parse the JSON array result.

@@ -9,7 +9,6 @@ format:
     self-contained: true
     theme: cosmo
     code-overflow: wrap
-
 ---
 
 ## Overview
@@ -252,7 +251,7 @@ ocr_pdf_with_gemini <- function(pdf_path, api_key) {
 
 See the original [PDF](https://lop.parl.ca/staticfiles/ParlInfo/Documents/ThroneSpeech/En/21-02-e.pdf)
 
-![screenshot of the PDF document.](data/pdf_screenshot.png)
+![screenshot of the PDF document.](figures/pdf_screenshot.png)
 
 ```{r}
 source("R/functions.R")

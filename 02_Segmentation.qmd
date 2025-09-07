@@ -9,7 +9,6 @@ format:
     self-contained: true
     theme: cosmo
     code-overflow: wrap
-
 ---
 
 ## Overview
@@ -519,7 +518,7 @@ results <- main(
 An interactive tool to review and correct LLM-based speech segmentations. The script loops through the speeches identified and recorded in llm_issues.csv. The screenshot below illustrates the options available.
 
 
-![Screenshot of the main menu for the interactive console review script below](data/Segmentation_Prompt.png)
+![Screenshot of the main menu for the interactive console review script below](figures/Segmentation_Prompt.png)
 
 **Note**: The script below will only run on R console (most IDEs should be fine. I used Positron with no issues).
 
