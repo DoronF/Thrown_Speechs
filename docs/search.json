@@ -1,0 +1,615 @@
+[
+  {
+    "objectID": "07_Topic_Shift_Analysis.html",
+    "href": "07_Topic_Shift_Analysis.html",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "",
+    "text": "Now that we have labels for out topic we can plot the topic shift and review statistics that might help us understand trends across the different models.\nThese metrics describe the behavior and nature of each topic over time.\n\n\nHow “spiky” or “stable” is a topic’s prominence over time?\nFor each topic, calculate the standard deviation or coefficient of variation of its average gamma scores across all speeches.\nInterpretation: A high volatility score indicates an “event-driven” topic that appears intensely and then fades (e.g., war, pandemic). A low score suggests a stable, persistent “background” topic that is always present.\n\n\n\nDoes a topic remain relevant long after its peak, or does it disappear completely? For each topic, calculate a “persistence score” by dividing its average gamma in the most recent year by its all-time peak gamma.\nInterpretation: A score close to 1 means the topic is still highly relevant today, even if its peak was long ago. A score close to 0 means the topic has largely faded from the discourse.\n\n\n\nHow unique are the words that define a topic? For each topic, count how many of its top 15 words are not in the top 15 words of any other topic in the same model.\nInterpretation: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#overview",
+    "href": "07_Topic_Shift_Analysis.html#overview",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "",
+    "text": "Now that we have labels for out topic we can plot the topic shift and review statistics that might help us understand trends across the different models.\nThese metrics describe the behavior and nature of each topic over time.\n\n\nHow “spiky” or “stable” is a topic’s prominence over time?\nFor each topic, calculate the standard deviation or coefficient of variation of its average gamma scores across all speeches.\nInterpretation: A high volatility score indicates an “event-driven” topic that appears intensely and then fades (e.g., war, pandemic). A low score suggests a stable, persistent “background” topic that is always present.\n\n\n\nDoes a topic remain relevant long after its peak, or does it disappear completely? For each topic, calculate a “persistence score” by dividing its average gamma in the most recent year by its all-time peak gamma.\nInterpretation: A score close to 1 means the topic is still highly relevant today, even if its peak was long ago. A score close to 0 means the topic has largely faded from the discourse.\n\n\n\nHow unique are the words that define a topic? For each topic, count how many of its top 15 words are not in the top 15 words of any other topic in the same model.\nInterpretation: High exclusivity suggests a very distinct and well-defined theme. Low exclusivity suggests a more general or foundational topic whose vocabulary is shared across many different policy areas.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#topics",
+    "href": "07_Topic_Shift_Analysis.html#topics",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "4 Topics",
+    "text": "4 Topics\nWe use the 4 topic model for more defined and interpretable topics.\n\n\nTopic Statistics and Cadence (Yearly)\n\n\n\n\n\n\nTopic\n\n\nPeak Year\n\n\nVolatility\n\n\nPersistence\n\n\nExclusivity\n\n\n\n\n\n\n\n\n\nParliamentary Procedure & Administration\n\n\n1878\n\n\n0.45\n\n\n0\n\n\n16\n\n\n\n\n\n\n\nInternational Affairs & Defense\n\n\n1946\n\n\n0.39\n\n\n0\n\n\n12\n\n\n\n\n\n\n\nEconomic Development & Growth\n\n\n1980\n\n\n0.32\n\n\n0\n\n\n12\n\n\n\n\n\n\n\nSocial Policy & Community Welfare\n\n\n2013\n\n\n0.34\n\n\n1\n\n\n19\n\n\n\n\nThe plot is striking. The topics are well defined and a clear pattern of a synchronized raising and declining prominence (stable Volatility). The topic labels seem to fit well with the eras each topic represents.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#topics-1",
+    "href": "07_Topic_Shift_Analysis.html#topics-1",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "8 Topics",
+    "text": "8 Topics\nThe 8 topics model is more temporal. Even though there more topics they are evenly exclusive.\n\n\nTopic Statistics and Cadence (Yearly)\n\n\n\n\n\n\nTopic\n\n\nPeak Year\n\n\nVolatility\n\n\nPersistence\n\n\nExclusivity\n\n\n\n\n\n\n\n\n\nParliamentary Business & Trade\n\n\n1878\n\n\n0.32\n\n\n0\n\n\n9\n\n\n\n\n\n\n\nInfrastructure & Regional Development\n\n\n1882\n\n\n0.40\n\n\n0\n\n\n9\n\n\n\n\n\n\n\nWar & International Relations\n\n\n1944\n\n\n0.33\n\n\n0\n\n\n7\n\n\n\n\n\n\n\nFederal-Provincial Coordination\n\n\n1962\n\n\n0.30\n\n\n0\n\n\n9\n\n\n\n\n\n\n\nEconomic Development Programs\n\n\n1967\n\n\n0.29\n\n\n0\n\n\n7\n\n\n\n\n\n\n\nSocial Programs & Healthcare\n\n\n2001\n\n\n0.22\n\n\n0\n\n\n9\n\n\n\n\n\n\n\nJobs & Economic Policy\n\n\n2010\n\n\n0.20\n\n\n0\n\n\n6\n\n\n\n\n\n\n\nIndigenous Affairs & Climate\n\n\n2020\n\n\n0.20\n\n\n1\n\n\n8\n\n\n\n\nWe now see topic that declined in prominence and later reemerge, like “War & International Relations”. We see periods where topics peek with less prominence. Topics in the early and late years, appear to have strong prominence.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#validation-against-major-events",
+    "href": "07_Topic_Shift_Analysis.html#validation-against-major-events",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "Validation against Major Events",
+    "text": "Validation against Major Events\nTo validate the topics prominence we compare them against major events and governments.\n\nMajor Canadian Historical Events\nThe table below lists partial but uncontroversial, major Canadian historical events marked in the plots below for.\n\nMajor Canadian Historical Events Since 1867\n\n\nDate\nEvent\n\n\n\n\n1867\nConfederation: The Dominion of Canada is formed.\n\n\n1885\nCompletion of the Canadian Pacific Railway.\n\n\n1914\nCanada enters World War I.\n\n\n1918\nWorld War I ends.\n\n\n1929\nGreat Depression begins.\n\n\n1939\nCanada enters World War II.\n\n\n1945\nWorld War II ends.\n\n\n1959\nSuez Crisis\n\n\n1973\nOil Embargo\n\n\n1982\nCanada Act 1982: Patriation of the Constitution.\n\n\n1995\nWidespread adoption of the internet.\n\n\n2001\nCanada joins the Afghanistan War.\n\n\n2020\nCOVID-19 pandemic: WHO declares a global pandemic.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#governments",
+    "href": "07_Topic_Shift_Analysis.html#governments",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "Governments",
+    "text": "Governments\nWe can also compare the topics prominence against the different governments and see if they “fit”.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "07_Topic_Shift_Analysis.html#conclusion",
+    "href": "07_Topic_Shift_Analysis.html#conclusion",
+    "title": "Topic Shift Analysis & Validation",
+    "section": "Conclusion",
+    "text": "Conclusion\nThis topic modeling analysis of Canadian Speeches from the Throne reveals meaningful patterns in political discourse that align closely with historical events and governmental transitions. The 4-topic model demonstrates clear temporal succession, with Parliamentary Procedure & Administration dominating the early confederation period, followed by International Affairs & Defense during the world wars, Economic Development & Growth in the post-war boom, and Social Policy & Community Welfare in the modern era. The 8-topic model provides additional granularity, capturing the cyclical nature of themes like “War & International Relations” that resurge during different conflicts, and revealing how contemporary issues like Indigenous Affairs & Climate have gained prominence in recent decades. The validation against major historical events—from Confederation through both World Wars, the Great Depression, and the COVID-19 pandemic—confirms that these computational methods successfully identify genuine shifts in political priorities.\nThese findings demonstrate that unsupervised machine learning can effectively uncover the evolution of political discourse, providing quantitative evidence for how Canadian political priorities have shifted across nearly 160 years of parliamentary debate. The use of Speeches from the Throne as our corpus was particularly valuable, as these ceremonial addresses represent a standardized format delivered at consistent intervals, creating a reliable yardstick for measuring thematic changes over time. Unlike other parliamentary speeches that vary widely in context and purpose, Throne Speeches serve as an index of governmental priorities, allowing us to track shifts in political focus with greater precision and comparability across different eras and administrations.",
+    "crumbs": [
+      "Overview",
+      "Analysis & Insights",
+      "Topic Shift Analysis & Validation"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html",
+    "href": "05_Topics_Extraction.html",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "",
+    "text": "LDA (Latent Dirichlet Allocation) is a probabilistic topic modeling technique that discovers hidden thematic structures in large collections of text documents. It assumes each document is a mixture of topics, and each topic is characterized by a distribution of words, allowing it to automatically identify and extract meaningful topics from unstructured text data. The model requires us to select the number of topics beforehand. Since it is unknown to us which number of topics is right, we train several LDA models with different numbers of topics (k). We then evaluate, compare and rank all the models’, topic quality and temporal balance. Finally we choose which number of topics is best overall.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#overview",
+    "href": "05_Topics_Extraction.html#overview",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "",
+    "text": "LDA (Latent Dirichlet Allocation) is a probabilistic topic modeling technique that discovers hidden thematic structures in large collections of text documents. It assumes each document is a mixture of topics, and each topic is characterized by a distribution of words, allowing it to automatically identify and extract meaningful topics from unstructured text data. The model requires us to select the number of topics beforehand. Since it is unknown to us which number of topics is right, we train several LDA models with different numbers of topics (k). We then evaluate, compare and rank all the models’, topic quality and temporal balance. Finally we choose which number of topics is best overall.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#setup",
+    "href": "05_Topics_Extraction.html#setup",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "Setup",
+    "text": "Setup\nWe load packages, most notably we load topicmodels for training the LDA models. we also load our project_stopwords and intrusion_regex (boilerplate), we established in the previous step.\n\n\nShow code\n# Load all necessary libraries\nlibrary(dplyr)\nlibrary(tidytext)\nlibrary(tidyr)\nlibrary(stringr)\nlibrary(ggplot2)\nlibrary(topicmodels)\nlibrary(purrr)\nlibrary(patchwork)\nlibrary(tictoc)\nlibrary(Matrix)\nlibrary(cowplot)\n\n# Load project-specific functions and data\nsource(\"R/functions.R\")\nclean_corpus &lt;- readr::read_csv(\n  \"output/segmentation/llm_clean_segmented_corpus.csv\"\n)\nintrusion_regex &lt;- readRDS(\"output/boilerplate/intrusion_regex.rds\")\nproject_stopwords &lt;- get_project_stopwords()\n\nk_values &lt;- c(4, 6, 8, 10, 12)",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#pre-processing",
+    "href": "05_Topics_Extraction.html#pre-processing",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "Pre-Processing",
+    "text": "Pre-Processing\nWe prepare the text and create a single Document-Term Matrix (DTM) using tidytext.\n\n\nShow code\n# Prepare tidy word list\nlemmatized_policy_words &lt;- clean_corpus %&gt;%\n  mutate(\n    policy_content = str_remove_all(\n      policy_content,\n      regex(intrusion_regex, ignore_case = TRUE)\n    )\n  ) %&gt;%\n  unnest_tokens(word, policy_content) %&gt;%\n  anti_join(project_stopwords, by = \"word\") %&gt;%\n  mutate(lemma = textstem::lemmatize_words(word))\n\n# Create the DTM for the topicmodels package\ndtm_tm &lt;- lemmatized_policy_words %&gt;%\n  count(filename, lemma, sort = TRUE) %&gt;%\n  cast_dtm(filename, lemma, n)",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#iterative-lda-topic-modeling",
+    "href": "05_Topics_Extraction.html#iterative-lda-topic-modeling",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "Iterative LDA Topic Modeling",
+    "text": "Iterative LDA Topic Modeling\nWe now train a separate LDA model for each k value k_values &lt;- c(4, 6, 8, 10, 12).\n\n\nShow code\ntic(\"Total training time for all models\")\nlda_models &lt;- k_values %&gt;%\n  purrr::map(function(k) {\n    LDA(dtm_tm, k = k, control = list(seed = 1867))\n  })\ntoc()\n\nsaveRDS(lda_models, \"output/models/lda_models.rds\")",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#model-results-and-analysis",
+    "href": "05_Topics_Extraction.html#model-results-and-analysis",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "Model Results and Analysis",
+    "text": "Model Results and Analysis\nTo evaluate the results we review the following:\n\nTopic Distribution by Era: Are the topics evenly distributed across the eras?\nTopic Prominence Over Time: Do the topics show clear prominence trends?\nTopic Quality: Dominance (how often a topic is the primary theme of a speech) vs. Exclusivity (uniqueness).\n\n\nTopic Distribution by Era\nWe can see how many topics peaked in each era:\n\nPre-War 1867 - 1940\nMid-Century 1940 - 1980\nModern Era 1980 - 2025\n\nwe want to see even distribution more or less so that topics are not concentrated in one time period.\n\nEra Distribution Grid\n\n\n\n\n\n\n\n\n\n\n\nProportional Distribution\n\n\n\n\n\nk_value\nPre-War %\nMid-Century %\nModern Era %\n\n\n\n\n4\n25.0\n25.0\n50.0\n\n\n6\n33.3\n16.7\n50.0\n\n\n8\n25.0\n37.5\n37.5\n\n\n10\n20.0\n40.0\n40.0\n\n\n12\n16.7\n41.7\n41.7\n\n\n\n\n\n\n\nEra Distribution Evenness Analysis\nLower std_dev, range_spread, and coeff_var = more even distribution\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\nPre-War\nMid-Century\nModern Era\nstd_dev\nrange_spread\ncoeff_var\nevenness_rank\n\n\n\n\n8\n2\n3\n3\n0.072\n0.125\n0.217\n1.0\n\n\n10\n2\n4\n4\n0.115\n0.200\n0.346\n2.0\n\n\n4\n1\n1\n2\n0.144\n0.250\n0.433\n3.5\n\n\n12\n2\n5\n5\n0.144\n0.250\n0.433\n3.5\n\n\n6\n2\n1\n3\n0.167\n0.333\n0.500\n5.0\n\n\n\n\n\nMost even distribution: k = 8\n\n\n\n\nTopic Prominence Over Time\nThis plot compares the topic prominence line charts for each k value. A good model should show distinct and interpretable trend lines.\n\nTime Series Plot\n\n\n\n\n\n\n\n\n\n\n\nSample of yearly prominence data\n\n\n\n\n\nyear\ntopic\navg_gamma\nk_value\n\n\n\n\n1867\n1\n0.9991544\n4\n\n\n1867\n2\n0.0002819\n4\n\n\n1867\n3\n0.0002819\n4\n\n\n1867\n4\n0.0002819\n4\n\n\n1869\n1\n0.9988441\n4\n\n\n1869\n2\n0.0003853\n4\n\n\n\n\n\n\n\nVariance-based Analysis\n\nHigher variance = more dynamic topics (some very prominent, some barely there)\n\nLower variance = more balanced prominence across topics\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\navg_variance\nmax_variance\nmin_variance\nhigh_variance_topics\n\n\n\n\n12\n0.0557\n0.1512\n0.0116\n12\n\n\n10\n0.0651\n0.1765\n0.0153\n10\n\n\n8\n0.0833\n0.1595\n0.0386\n8\n\n\n6\n0.0940\n0.1606\n0.0418\n6\n\n\n4\n0.1430\n0.2016\n0.1021\n4\n\n\n\n\n\nVariance Analysis (lower avg_variance = more stable topics)\n\n\n“Dead Topics” Analysis\nCount topics that never achieve meaningful prominence\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\ntotal_topics\ndead_topics\nweak_topics\nmoderate_topics\nstrong_topics\ndead_topic_pct\nweak_topic_pct\n\n\n\n\n4\n4\n0\n0\n0\n4\n0\n0\n\n\n6\n6\n0\n0\n0\n6\n0\n0\n\n\n8\n8\n0\n0\n0\n8\n0\n0\n\n\n10\n10\n0\n0\n0\n10\n0\n0\n\n\n12\n12\n0\n0\n0\n12\n0\n0\n\n\n\n\n\nThere are no “dead topics”.\n\n\nProminence Range Analysis\nLook at the spread between most and least prominent topics each year.\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\navg_range\navg_dominant_strength\navg_weakest_strength\nmax_range\n\n\n\n\n4\n0.9005\n0.9008\n3e-04\n0.9999\n\n\n8\n0.8641\n0.8641\n1e-04\n0.9999\n\n\n10\n0.8531\n0.8532\n1e-04\n0.9999\n\n\n12\n0.8443\n0.8443\n0e+00\n0.9999\n\n\n6\n0.8290\n0.8291\n1e-04\n0.9999\n\n\n\n\n\nRange Analysis (higher avg_range might = better topic separation)\n\n\nCombined Ranking\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\nvariance_rank\ndead_rank\nrange_rank\ncombined_score\noverall_rank\n\n\n\n\n8\n3\n3\n2\n8\n2\n\n\n10\n2\n3\n3\n8\n2\n\n\n12\n1\n3\n4\n8\n2\n\n\n4\n5\n3\n1\n9\n4\n\n\n6\n4\n3\n5\n12\n5\n\n\n\n\n\nCombined Ranking (lower overall rank = better model): * Variance rank: 1 = most stable topics\n* Dead rank: 1 = fewest useless topics\n* Range rank: 1 = best topic separation\n\n\n\n\nTopic Quality: Dominance vs. Exclusivity\nThis plot compares topic dominance (how often a topic is the primary theme of a speech) with exclusivity. This helps identify which topics are both important and unique.\n\nDominance Plot\n\n\n\n\n\n\n\n\n\n● Pre-War (pre-1940) ▲ Mid-Century (1940-1980) ■ Modern Era (1980+)\n\n\nSample of topic metrics data:\n\n\n\n\n\nk_value\ntopic\nexclusivity\ndominance_count\nera\n\n\n\n\n4\n1\n16\n55\nPre-War\n\n\n4\n2\n19\n19\nModern Era\n\n\n4\n3\n12\n57\nMid-Century\n\n\n4\n4\n12\n21\nModern Era\n\n\n6\n1\n13\n38\nPre-War\n\n\n6\n2\n18\n13\nModern Era\n\n\n\n\n\n\n\nDominance + Exclusivity Quality Score\nModel Quality Summary (higher avg_quality_score = better):\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\navg_quality_score\navg_weighted_score\nhigh_quality_topics\nbalanced_topics\nlow_quality_topics\nquality_std\navg_exclusivity\navg_dominance\n\n\n\n\n4\n0.694\n0.702\n2\n1\n0\n0.187\n14.8\n38.0\n\n\n6\n0.509\n0.526\n0\n4\n1\n0.165\n12.5\n25.3\n\n\n8\n0.311\n0.311\n0\n0\n4\n0.121\n8.0\n19.0\n\n\n10\n0.282\n0.291\n0\n1\n7\n0.147\n8.2\n15.2\n\n\n12\n0.240\n0.249\n0\n1\n9\n0.147\n7.6\n12.7\n\n\n\n\n\n\n\nPrincipal Component Analysis on Dominance + Exclusivity\nThe PCA reveals that dominance and exclusivity are moderately correlated, with 70% of the variance captured by the first principal component. This suggests these two quality metrics largely move together - topics that dominate more speeches tend to also be more exclusive (have unique vocabulary).\n\n\nImportance of components:\n                          PC1    PC2\nStandard deviation     1.1830 0.7749\nProportion of Variance 0.6998 0.3002\nCumulative Proportion  0.6998 1.0000\n\n\nPCA Model Summary (higher avg_pc1 = better overall quality):\n\n\n\n\n\nk_value\navg_pc1\navg_pc2\npc1_std\n\n\n\n\n12\n0.650\n0.038\n0.866\n\n\n10\n0.402\n0.035\n0.838\n\n\n8\n0.259\n0.259\n0.669\n\n\n6\n-0.961\n-0.350\n0.942\n\n\n4\n-2.030\n-0.196\n1.031\n\n\n\n\n\nVariable Contributions to PC1:\n\n\n    exclusivity dominance_count \n         -0.707          -0.707 \n\n\nCorrelation between Exclusivity and Dominance: 0.3995785\n\n\nTopic Efficiency Analysis\nTopic Efficiency Analysis (higher efficiency_rate = more good topics per k):\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\ntotal_topics\nhigh_quality_count\nefficiency_rate\navg_exclusivity_per_topic\navg_dominance_per_topic\nexclusivity_per_k\ndominance_per_k\n\n\n\n\n4\n4\n3\n75.0\n14.75\n38.00\n14.75\n38.00\n\n\n6\n6\n2\n33.3\n12.50\n25.33\n12.50\n25.33\n\n\n10\n10\n1\n10.0\n8.20\n15.20\n8.20\n15.20\n\n\n8\n8\n0\n0.0\n8.00\n19.00\n8.00\n19.00\n\n\n12\n12\n0\n0.0\n7.58\n12.67\n7.58\n12.67\n\n\n\n\n\n\n\nFinal Topic Quality Ranking\nFinal Ranking (lower final_rank = better dominance + exclusivity combination):\n\n\n\n\n\n\n\n\n\n\n\n\n\nk_value\nquality_rank\npca_rank\nefficiency_rank\ncombined_score\nfinal_rank\n\n\n\n\n4\n1\n5\n1.0\n2.333333\n1\n\n\n6\n2\n4\n2.0\n2.666667\n1\n\n\n8\n3\n3\n4.5\n3.500000\n1\n\n\n10\n4\n2\n3.0\n3.000000\n1\n\n\n12\n5\n1\n4.5\n3.500000\n1",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "05_Topics_Extraction.html#conclusion",
+    "href": "05_Topics_Extraction.html#conclusion",
+    "title": "LDA Topic Extraction and Analysis",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe analysis reveals a clear trade-off between topic quality and temporal balance.\n\nFor Highest Topic Quality: The k=4 model is the undisputed winner. It produces the most distinct, dominant, and efficient topics. If the goal is to identify the strongest, most interpretable themes in the corpus, k=4 is the best choice.\nFor Best Temporal Balance: The k=8 model offers the most even distribution of topics across historical eras (Pre-War, Mid-Century, Modern Era) and demonstrates high stability in topic prominence over time. If the goal is to analyze how different themes evolve and ensure all periods are represented, k=8 is the superior option.\n\nSince they have different things to tell us about the texts, we choose both.\nNext Step: LLM Interpretation of Topic Models →",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "LDA Topic Extraction and Analysis"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html",
+    "href": "03_Exploratory_Analysis.html",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "",
+    "text": "This document performs an initial exploratory data analysis (EDA) on the segmented corpus of Canadian Throne Speeches. The goal is to uncover broad patterns in the text data over time, focusing on word frequencies, repeated phrases (n-grams), and key terms that characterize different eras.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#overview",
+    "href": "03_Exploratory_Analysis.html#overview",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "",
+    "text": "This document performs an initial exploratory data analysis (EDA) on the segmented corpus of Canadian Throne Speeches. The goal is to uncover broad patterns in the text data over time, focusing on word frequencies, repeated phrases (n-grams), and key terms that characterize different eras.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#setup",
+    "href": "03_Exploratory_Analysis.html#setup",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "Setup",
+    "text": "Setup\nFirst, we load the required libraries for data manipulation, text analysis, and visualization.\n\n\nShow code\n# Data Manipulation and Analysis\nlibrary(dplyr)\nlibrary(tidytext)\nlibrary(stringr)\nlibrary(textstem)\nlibrary(tidyr)\n# Visualization\nlibrary(ggplot2)\nlibrary(scales)\n\nsource(\"R/functions.R\")",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#data-loading",
+    "href": "03_Exploratory_Analysis.html#data-loading",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "Data Loading",
+    "text": "Data Loading\nWe then load the segmented corpus and summary files created in the previous step.\n\n\nShow code\n# Load the pre-processed data from the segmentation step\nclean_corpus &lt;- readr::read_csv(\n  \"output/segmentation/llm_clean_segmented_corpus.csv\"\n)\nspeech_summaries &lt;- readr::read_csv(\n  \"output/segmentation/llm_speech_summaries.csv\"\n)\n\n# Create a decade field for grouping\nspeeches_df &lt;- clean_corpus %&gt;%\n  mutate(decade = paste0(floor(year / 10) * 10, \"s\"))\n\ncustom_stop_words &lt;- get_project_stopwords()\n\nanalytical_corpus &lt;- speeches_df %&gt;%\n  # Unnest, clean, and lemmatize the words\n  unnest_tokens(word, policy_content) %&gt;%\n  anti_join(custom_stop_words, by = \"word\") %&gt;%\n  mutate(lemma = lemmatize_words(word)) %&gt;%\n  mutate(\n    lemma = case_when(\n      lemma %in% c(\"canadian\", \"canada's\") ~ \"canada\",\n      TRUE ~ lemma\n    )\n  ) %&gt;%\n  # Re-assemble the cleaned text for each speech\n  group_by(filename, date, year, parliament, decade) %&gt;%\n  summarise(\n    clean_policy_text = str_c(lemma, collapse = \" \"),\n    .groups = \"drop\"\n  )",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#basic-text-statistics-by-decade",
+    "href": "03_Exploratory_Analysis.html#basic-text-statistics-by-decade",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "Basic Text Statistics by Decade",
+    "text": "Basic Text Statistics by Decade\nLet’s start by looking at some high-level statistics to see how the speeches have changed over time. We can examine the number of speeches and their average length by decade. Here, we’ll focus on the word count of the policy_content section, as this is the core of the speech.\nNote: The first speech was given in 1867.\n\n\n# A tibble: 17 × 3\n   decade number_of_speeches avg_policy_words\n   &lt;chr&gt;               &lt;int&gt;            &lt;dbl&gt;\n 1 1860s                   2             322 \n 2 1870s                  11             808.\n 3 1880s                  10             694.\n 4 1890s                  11             578.\n 5 1900s                  11             711.\n 6 1910s                  11             642.\n 7 1920s                  10             934 \n 8 1930s                  12             875.\n 9 1940s                  13             928.\n10 1950s                  14             953.\n11 1960s                  11            2176.\n12 1970s                   9            2399.\n13 1980s                   6            3171.\n14 1990s                   5            3585.\n15 2000s                   8            3576 \n16 2010s                   5            3612 \n17 2020s                   3            3460.\n\n\n\n\n\n\n\n\n\nThis initial view shows how the substantive policy portion of the speeches has grown considerably over time, peaking in the mid-to-late 20th century.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#word-frequency-analysis",
+    "href": "03_Exploratory_Analysis.html#word-frequency-analysis",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "Word Frequency Analysis",
+    "text": "Word Frequency Analysis\nNow, let’s identify the most common words used in the policy_content of the speeches. This helps us understand the core vocabulary.\n\n\n# A tibble: 20 × 2\n   lemma             n\n   &lt;chr&gt;         &lt;int&gt;\n 1 work            732\n 2 country         622\n 3 good            514\n 4 economic        509\n 5 province        494\n 6 development     488\n 7 people          466\n 8 world           460\n 9 trade           420\n10 house           418\n11 service         399\n12 economy         398\n13 parliament      389\n14 unite           382\n15 legislation     374\n16 public          367\n17 community       353\n18 opportunity     332\n19 support         325\n20 international   322\n\n\n\n\n\n\n\n\n\nWords like “government,” “canada,” and “development” are, unsurprisingly, common, reflecting the nature of these speeches.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "03_Exploratory_Analysis.html#n-gram-analysis",
+    "href": "03_Exploratory_Analysis.html#n-gram-analysis",
+    "title": "Exploratory Analysis of Throne Speeches",
+    "section": "N-gram Analysis",
+    "text": "N-gram Analysis\nWord frequencies are useful, but context is often lost. N-grams are sequences of N words, which help us find commonly repeated phrases. Let’s look at bigrams (2-word phrases) to see what concepts often appear together.\n\n\n# A tibble: 20 × 2\n   bigram                    n\n   &lt;chr&gt;                 &lt;int&gt;\n 1 house common            226\n 2 unite state             172\n 3 gentleman house         104\n 4 public service          100\n 5 unite nation             95\n 6 co operation             91\n 7 last session             90\n 8 province territory       79\n 9 provincial government    78\n10 member house             76\n11 long term                75\n12 health care              74\n13 private sector           71\n14 federal provincial       70\n15 work province            68\n16 submit consideration     57\n17 21st century             53\n18 gentleman senate         53\n19 senate gentleman         53\n20 unite kingdom            52\n\n\nPhrases like “house common” , “united states,” and “government work” appear frequently, highlighting key entities and concepts in Canadian political discourse.\nNote: Lemmatization replaces words with their root form (e.g., “working” -&gt; “work,” “governmental” -&gt; “government”). This is why a phrase like “government work” appears frequently, as it captures many variations of the original phrasing.\nNext Step: Boilerplate Identification →",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Exploratory Analysis of Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html",
+    "href": "01_Data.html",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "",
+    "text": "This document provides a complete, reproducible pipeline for creating a high-quality text corpus of Canadian Throne Speeches. The process involves scraping an index page from the Parliament of Canada website, programmatically processing downloadable PDFs using the Gemini 1.5 Vision model for high-quality OCR, and providing an interactive workflow to handle speeches that require manual extraction. The final output is a clean throne_speeches directory with text file for each speech, and a speech_index.csv file.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#overview",
+    "href": "01_Data.html#overview",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "",
+    "text": "This document provides a complete, reproducible pipeline for creating a high-quality text corpus of Canadian Throne Speeches. The process involves scraping an index page from the Parliament of Canada website, programmatically processing downloadable PDFs using the Gemini 1.5 Vision model for high-quality OCR, and providing an interactive workflow to handle speeches that require manual extraction. The final output is a clean throne_speeches directory with text file for each speech, and a speech_index.csv file.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#setup-and-configuration",
+    "href": "01_Data.html#setup-and-configuration",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "Setup and Configuration",
+    "text": "Setup and Configuration\nFirst, we load the required R packages and configure the environment. This includes securely loading the API key and defining all the helper functions we’ll need for scraping, transcribing, saving, and indexing the speeches.\n\nLibraries\n\n# Required Libraries\nlibrary(rvest) # For web scraping\nlibrary(dplyr) # For data manipulation\nlibrary(stringr) # For text cleaning\nlibrary(httr2) # For API requests and downloads\nlibrary(pdftools) # To convert PDFs to images\nlibrary(jsonlite) # To handle JSON\nlibrary(base64enc) # To encode images\nlibrary(purrr) # For functional programming\nlibrary(readr) # For writing files\nlibrary(clipr) # For using save from clipboard\n\n\n\nAPI Key and Output Directory\n\n# --- API Key Configuration ---\n# The API key is loaded securely from an environment variable.\nGEMINI_API_KEY &lt;- Sys.getenv(\"GEMINI_API_KEY\")\n\n# --- Define Output Directory ---\noutput_dir &lt;- \"output/throne_speeches_txt/\"\nif (!dir.exists(output_dir)) {\n  dir.create(output_dir)\n}",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#functions",
+    "href": "01_Data.html#functions",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "Functions",
+    "text": "Functions\nFunctions are all in a central R script to ensure uniformity across the different steps. Here we use the functions:\n\nscrape_throne_speech_links: takes an html file or URL with the speech index and returns a dataframe with: parliament, session, date and pdf_url\n\n\n\nShow code\n# Web Scraping and OCR Functions\nscrape_throne_speech_links &lt;- function(html_path) {\n  cat(\"Reading and scraping HTML file to find speeches...\\n\")\n  page &lt;- read_html(html_path)\n  rows &lt;- page %&gt;% html_elements(\".dx-datagrid-table tr[role='row']\")\n  current_parliament &lt;- NA\n\n  speeches_df &lt;- map_dfr(rows, function(row) {\n    if (html_attr(row, \"class\") %&gt;% str_detect(\"dx-group-row\")) {\n      parliament_text &lt;- row %&gt;% html_element(\".dx-group-cell\") %&gt;% html_text()\n      current_parliament &lt;&lt;- str_extract(parliament_text, \"\\\\d+\")\n      return(NULL)\n    }\n\n    if (html_attr(row, \"class\") %&gt;% str_detect(\"dx-data-row\")) {\n      cells &lt;- row %&gt;% html_elements(\"td\")\n      session &lt;- cells[[2]] %&gt;% html_text()\n      journal_date_text &lt;- cells[[3]] %&gt;% html_text()\n      pdf_link_node &lt;- cells[[5]] %&gt;% html_element(\"a\")\n\n      if (is.na(pdf_link_node)) {\n        return(NULL)\n      }\n\n      pdf_url &lt;- pdf_link_node %&gt;% html_attr(\"href\")\n      speech_date &lt;- str_extract(journal_date_text, \"\\\\d{4}-\\\\d{2}-\\\\d{2}\")\n\n      if (str_starts(pdf_url, \"/\")) {\n        pdf_url &lt;- paste0(\"[https://lop.parl.ca](https://lop.parl.ca)\", pdf_url)\n      }\n\n      tibble(\n        parliament = as.numeric(current_parliament),\n        session = as.numeric(session),\n        date = speech_date,\n        pdf_url = pdf_url\n      )\n    }\n  })\n\n  cat(\"Found\", nrow(speeches_df), \"speeches with document links.\\n\")\n  return(speeches_df %&gt;% filter(!is.na(date)) %&gt;% arrange(date))\n}\n\n\n\nocr_pdf_with_gemini: The function converts the PDF files into high-resolution images and submits them to Gemini API with the following prompt:\n\n\n“This image is a page from a bilingual historical document, with English and French text often in separate columns. Please transcribe ONLY THE ENGLISH TEXT from the page. Ignore the French text completely. Also, ignore page numbers, headers, and footers. Preserve the original paragraph breaks from the English text.”\n\n\n\nShow code\n#' Transcribes text from a PDF file using the Gemini Vision API.\nocr_pdf_with_gemini &lt;- function(pdf_path, api_key) {\n  cat(\"Step 1: Converting PDF to high-resolution images...\\n\")\n  image_files &lt;- tryCatch(\n    {\n      pdftools::pdf_convert(pdf_path, format = 'png', dpi = 300)\n    },\n    error = function(e) {\n      cat(\"ERROR: pdftools failed to convert\", basename(pdf_path), \"\\n\")\n      return(NULL)\n    }\n  )\n\n  if (is.null(image_files)) {\n    return(\"Error: PDF conversion failed.\")\n  }\n\n  on.exit(file.remove(image_files), add = TRUE)\n\n  cat(\n    \"Step 2: Sending\",\n    length(image_files),\n    \"pages to Gemini for transcription...\\n\"\n  )\n\n  text_from_pages &lt;- map_chr(image_files, function(img_file) {\n    encoded_image &lt;- base64enc::base64encode(img_file)\n    url &lt;- \"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent\"\n\n    prompt &lt;- \"This image is a page from a bilingual historical document, with English and French text often in separate columns. Please transcribe ONLY THE ENGLISH TEXT from the page. Ignore the French text completely. Also, ignore page numbers, headers, and footers. Preserve the original paragraph breaks from the English text.\"\n\n    req_body &lt;- list(\n      contents = list(\n        list(\n          parts = list(\n            list(text = prompt),\n            list(\n              inline_data = list(\n                mime_type = \"image/png\",\n                data = encoded_image\n              )\n            )\n          )\n        )\n      ),\n      safetySettings = list(\n        list(category = \"HARM_CATEGORY_HARASSMENT\", threshold = \"BLOCK_NONE\"),\n        list(category = \"HARM_CATEGORY_HATE_SPEECH\", threshold = \"BLOCK_NONE\"),\n        list(\n          category = \"HARM_CATEGORY_SEXUALLY_EXPLICIT\",\n          threshold = \"BLOCK_NONE\"\n        ),\n        list(\n          category = \"HARM_CATEGORY_DANGEROUS_CONTENT\",\n          threshold = \"BLOCK_NONE\"\n        )\n      )\n    )\n\n    resp &lt;- tryCatch(\n      {\n        request(url) %&gt;%\n          req_url_query(key = api_key) %&gt;%\n          req_body_json(req_body) %&gt;%\n          req_timeout(90) %&gt;%\n          req_perform()\n      },\n      error = function(e) {\n        cat(\n          \"NETWORK ERROR on page:\",\n          basename(img_file),\n          \"-\",\n          e$message,\n          \"\\n\"\n        )\n        return(NULL)\n      }\n    )\n\n    if (is.null(resp)) {\n      return(paste(\"Error: Network failure on page\", basename(img_file)))\n    }\n\n    if (resp_status(resp) == 200) {\n      body &lt;- resp_body_json(resp)\n      if (!is.null(body$candidates) && length(body$candidates) &gt; 0) {\n        text_response &lt;- body$candidates[[1]]$content$parts[[1]]$text\n        if (!is.null(text_response)) {\n          return(text_response)\n        }\n      }\n      reason &lt;- body$promptFeedback$blockReason %||% \"No text in response\"\n      cat(\n        \"WARNING: API returned OK but no content for page:\",\n        basename(img_file),\n        \"Reason:\",\n        reason,\n        \"\\n\"\n      )\n      return(paste(\"Error: No text returned for page\", basename(img_file)))\n    } else {\n      cat(\n        \"API ERROR on page:\",\n        basename(img_file),\n        \"- Status:\",\n        resp_status(resp),\n        \"\\n\"\n      )\n      return(paste(\"Error: API returned status\", resp_status(resp)))\n    }\n  })\n\n  cat(\"Step 3: Assembling and cleaning the final text...\\n\")\n\n  final_text &lt;- paste(text_from_pages, collapse = \"\\n\\n\") %&gt;%\n    str_replace_all(\"Error: [[:print:]]+\", \"\") %&gt;%\n    str_replace_all(\"\\\\s*\\\\r?\\\\n\\\\s*\", \" \") %&gt;%\n    str_replace_all(\"\\\\s+\", \" \") %&gt;%\n    str_trim()\n\n  return(final_text)\n}\n\n\n\nsave_speech: is used by ocr_pdf_with_gemini to save and index the speeches. It takes in the speech text, date and parliament number to be included in a metadata header:\n\n\n# THRONE SPEECH METADATA\n# Date: 1950-02-16\n# Parliament: 21\n# File created: 2025-08-20\n# =====================================\nA.D. 1950 16TH FEBRUARY 3 IN TESTIMONY WHEREOF We have caused these Our Letters to be made Patent and the Great Seal of Canada to be hereunto affixed. WITNESS: Our Right Trusty and Well-beloved Cousin, …\n\nSee the original PDF\n\n\n\nscreenshot of the PDF document.\n\n\n\n\nShow code\nsource(\"R/functions.R\")",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#automated-corpus-regeneration",
+    "href": "01_Data.html#automated-corpus-regeneration",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "Automated Corpus Regeneration",
+    "text": "Automated Corpus Regeneration\nThis block runs the automated part of the process. It scrapes the HTML, then loops through all the direct PDF links to download and transcribe them, using the shared save_speech function.\nNote: The following code chunk is set to eval=FALSE. To run the automated regeneration, change the chunk option to {r run-automated-process, eval=TRUE} and execute it.\n\n\nShow code\n# Scrape the HTML file to get the list of speeches\nhtml_file &lt;- \"data/throne_speeches_raw/Speeches from the Throne.html\"\nall_speeches &lt;- scrape_throne_speech_links(html_file)\n\nskipped_speeches &lt;- tibble()\n\n# Loop through and process all direct PDF links\nfor (i in 1:nrow(all_speeches)) {\n  speech_info &lt;- all_speeches[i, ]\n  cat(paste0(\n    \"Evaluating speech \",\n    i,\n    \" of \",\n    nrow(all_speeches),\n    \": \",\n    speech_info$date,\n    \"\\n\"\n  ))\n\n  is_pdf_link &lt;- str_ends(speech_info$pdf_url, \"\\\\.pdf\")\n\n  if (is_pdf_link) {\n    temp_pdf_path &lt;- tempfile(fileext = \".pdf\")\n\n    tryCatch(\n      {\n        cat(\"Link is a PDF. Downloading from:\", speech_info$pdf_url, \"\\n\")\n        request(speech_info$pdf_url) %&gt;%\n          req_perform(path = temp_pdf_path)\n\n        # Run the OCR function\n        final_text &lt;- ocr_pdf_with_gemini(temp_pdf_path, GEMINI_API_KEY)\n\n        if (!is.null(final_text) && nchar(final_text) &gt; 0) {\n          save_speech(\n            speech_text = final_text,\n            date = speech_info$date,\n            parliament = speech_info$parliament,\n            base_dir = output_dir\n          )\n        } else {\n          cat(\n            \"WARNING: OCR failed or returned empty text for\",\n            speech_info$date,\n            \"\\n\"\n          )\n        }\n      },\n      error = function(e) {\n        cat(\n          \"ERROR: Failed to process\",\n          speech_info$date,\n          \". Error:\",\n          e$message,\n          \"\\n\"\n        )\n      }\n    )\n    if (file.exists(temp_pdf_path)) {\n      file.remove(temp_pdf_path)\n    }\n  } else {\n    cat(\n      \"SKIPPING: Link is not a direct PDF. Adding to manual review list.\\n\"\n    )\n    cat(\"URL:\", speech_info$pdf_url, \"\\n\")\n\n    skipped_speeches &lt;- skipped_speeches %&gt;%\n      bind_rows(\n        tibble(\n          parliament = speech_info$parliament,\n          session = speech_info$session,\n          date = speech_info$date,\n          skipped_url = speech_info$pdf_url,\n          reason = \"Not a direct .pdf link\"\n        )\n      )\n  }\n  Sys.sleep(1)\n}\n\n# Save the list of skipped speeches to a CSV file\nif (nrow(skipped_speeches) &gt; 0) {\n  write_csv(skipped_speeches, \"_skipped_for_manual_review.csv\")\n  cat(\n    \"\\nATTENTION: A list of skipped speeches was saved to '_skipped_for_manual_review.csv'\\n\"\n  )\n}\n\n# Create the index for all automatically processed speeches\ncreate_speech_index(base_dir = output_dir)\n\ncat(\"Automated corpus regeneration complete!\\n\")",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#processing-skipped-speeches",
+    "href": "01_Data.html#processing-skipped-speeches",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "Processing Skipped Speeches",
+    "text": "Processing Skipped Speeches\nSince recent speeches are no longer in the form of scanned PDFs, we skipped them in the previous step and produced a _skipped_for_manual_review.csv file.\n\nProcessing Exceptional Speech\nThe speech from 1989, 3rd session of the 34th Parliament, is a bit tricky. It is in the form of an interactive pdf viewer which lets you view one page at a time. I ended up downloading the complete PDF (“print”/save as PDF) from a pdf reader and only “printing” the pages with the speech. The pdf is included in the data folder and can be processed by passing it to ocr_pdf_with_gemini and save_speech for processing uniformity.\n\n\nShow code\npdf &lt;- \"data/throne_speeches_raw/pdf/34_03.pdf\"\n\ntext &lt;- ocr_pdf_with_gemini(pdf, GEMINI_API_KEY)\n\nsave_speech(\n  speech_text = text,\n  date = \"1991-05-13\",\n  parliament = 34\n)\n\n\n\n\nInteractive Processing\nThe code in the next cell will prompt you in the R console to manually copy the text for each of the remaining speeches. A URL for each speech is provided for convenience. Following the URL lets you select and copy the speech to the clipboard (Ctrl+C) and then simply hit Enter in the R console.\nNote: This chunk must be run interactively in the R console. It will not work when rendering the document.\n\n\nShow code\n## INTERACTIVE SESSION FOR SKIPPED SPEECHES\nskipped_file &lt;- \"_skipped_for_manual_review.csv\"\n\nif (file.exists(skipped_file)) {\n  skipped_df &lt;- read_csv(skipped_file, show_col_types = FALSE)\n\n  if (nrow(skipped_df) &gt; 0) {\n    cat(\n      \"Starting interactive session to process\",\n      nrow(skipped_df),\n      \"skipped speeches.\\n\"\n    )\n\n    for (i in 1:nrow(skipped_df)) {\n      speech_info &lt;- skipped_df[i, ]\n\n      #  Instructions for the user\n      cat(\"\\n--------------------------------------------------\\n\")\n      cat(\"--- PROCESSING SKIPPED SPEECH\", i, \"of\", nrow(skipped_df), \"---\\n\")\n      cat(\"          Date:\", speech_info$date, \"\\n\")\n      cat(\"    Parliament:\", speech_info$parliament, \"\\n\\n\")\n      cat(\"1. Open this URL in your browser:\\n\")\n      cat(\"  \", speech_info$skipped_url, \"\\n\\n\")\n      cat(\"2. Manually select and copy ONLY the text of the speech itself.\\n\\n\")\n\n      readline(\n        prompt = \"After copying the text, return here and press [Enter] to continue...\"\n      )\n\n      # Read the text vector directly from the system clipboard\n      speech_text_vector &lt;- clipr::read_clip()\n\n      if (!is.null(speech_text_vector) && length(speech_text_vector) &gt; 0) {\n        speech_text_single_string &lt;- paste(speech_text_vector, collapse = \" \")\n\n        # Use the existing save_speech function with the single string\n        save_speech(\n          speech_text = speech_text_single_string,\n          date = speech_info$date,\n          parliament = speech_info$parliament\n        )\n      } else {\n        cat(\"\\nClipboard is empty. Skipping this speech.\\n\")\n      }\n    }\n    cat(\"\\nInteractive session complete.\\n\")\n  } else {\n    cat(\"The skipped speeches file is empty. Nothing to process.\\n\")\n  }\n} else {\n  cat(\"No '_skipped_for_manual_review.csv' file found. Nothing to do.\\n\")\n}",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "01_Data.html#conclusion",
+    "href": "01_Data.html#conclusion",
+    "title": "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe above process produces a folder with text files for each speech and an index file for future processing.\nIn the next step, we segment the speeches using Gemini LLM to classify sentences as part of: opening_ceremonial, policy_content, closing_ceremonial and unclassified.\nNext Step: Segmentation of Throne Speeches using Gemini LLM →",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Reproducible Corpus Creation: Scraping and Transcribing Throne Speeches"
+    ]
+  },
+  {
+    "objectID": "00-Overview.html",
+    "href": "00-Overview.html",
+    "title": "Statistical Text Mining of Standardized Political Documents",
+    "section": "",
+    "text": "This project provides a complete, reproducible pipeline for analyzing the evolution of political discourse in Canadian Speeches from the Throne, from Confederation in 1867 to the present day. By applying a combination of modern data science tools, we can quantitatively map the thematic shifts in Canadian political priorities over nearly 160 years.\nThe corpus of Throne Speeches is uniquely suited for this analysis. As ceremonial addresses delivered at consistent intervals, they offer a standardized format that serves as a reliable index of governmental priorities, allowing for precise and comparable tracking of thematic changes across different eras and administrations.\n\n\nThe project is structured as a multi-stage data processing and analysis pipeline. Each step is designed to be reproducible, transforming the raw source material into a structured dataset ready for thematic modeling and interpretation.\n\n\n\nReproducible Corpus Creation: Scraping and Transcribing Throne Speeches\n\nObjective: To build a comprehensive and clean text corpus of all Throne Speeches.\nProcess: An index of speeches is scraped from the Parliament of Canada website. PDFs of historical speeches are transcribed using the Gemini 1.5 Vision model for high-quality optical character recognition (OCR), while modern speeches are handled through an interactive workflow.\nOutput: A directory of individual speech text files and a master index CSV file.\n\nSegmentation of Throne Speeches using Gemini LLM\n\nObjective: To divide each speech into its distinct rhetorical parts.\nProcess: The Gemini LLM is used to segment the text of each speech into three categories: opening_ceremonial, policy_content, and closing_ceremonial. An interactive review tool allows for verification and correction of any segmentations flagged by the system.\nOutput: A structured, segmented corpus in CSV format, with each sentence categorized.\n\nExploratory Analysis of Throne Speeches\n\nObjective: To uncover broad, high-level patterns in the cleaned text data over time.\nProcess: An initial exploratory data analysis (EDA) is performed on the policy_content sections, examining word frequencies, common phrases, and other basic text statistics by decade.\n\n\n\n\n\n\nBoilerplate Identification\n\nObjective: To identify and isolate recurring, non-substantive formal phrases.\nProcess: The ceremonial sections are analyzed to find common, repeated phrases (n-grams), which are compiled into a “boilerplate dictionary”. This dictionary is then used to filter these structural phrases out of the substantive policy_content.\nOutput: A regular expression (intrusion_regex.rds) containing all identified boilerplate phrases.\n\nLDA Topic Extraction and Analysis\n\nObjective: To discover the hidden thematic structures within the policy content.\nProcess: Several Latent Dirichlet Allocation (LDA) topic models are trained with varying numbers of topics (k). These models are evaluated on metrics of topic quality and temporal balance to select the most coherent and historically representative models for final analysis. The models with k=4 and k=8 topics were chosen as they provided the best trade-off between topic quality and temporal balance.\nOutput: A set of trained LDA models (lda_models.rds).\n\nLLM Interpretation of Topic Models\n\nObjective: To assign meaningful, human-readable labels to the machine-generated topics.\nProcess: To ensure speed and reproducibility, a Large Language Model (Anthropic’s Claude) is prompted to interpret the word clusters for each topic. The LLM provides a concise descriptive label and a one-sentence summary for each topic.\nOutput: A file containing the LLM-generated labels for each topic in each model (llm_topic_labels.rds).\n\n\n\n\n\n\nTopic Shift Analysis & Validation\n\nObjective: To visualize, analyze, and validate the evolution of topics over time.\nProcess: The prominence of each interpreted topic is plotted over time to reveal thematic shifts in Canadian political discourse. The resulting trends are then validated by comparing them against major Canadian historical events and periods of government, confirming that the model captures genuine shifts in political priorities.\n\n\n\n\n\n\nThis pipeline demonstrates that a combination of modern data science tools can effectively uncover and quantify the evolution of political discourse from historical texts. The findings reveal meaningful patterns that align closely with Canada’s historical trajectory, from its early focus on administration and development to its engagement in global conflicts and the recent rise of social and environmental policy concerns.\nNext Step: Scraping and Transcribing Throne Speeches →",
+    "crumbs": [
+      "Overview",
+      "Project Overview",
+      "Statistical Text Mining of Standardized Political Documents"
+    ]
+  },
+  {
+    "objectID": "00-Overview.html#the-analysis-pipeline",
+    "href": "00-Overview.html#the-analysis-pipeline",
+    "title": "Statistical Text Mining of Standardized Political Documents",
+    "section": "",
+    "text": "The project is structured as a multi-stage data processing and analysis pipeline. Each step is designed to be reproducible, transforming the raw source material into a structured dataset ready for thematic modeling and interpretation.\n\n\n\nReproducible Corpus Creation: Scraping and Transcribing Throne Speeches\n\nObjective: To build a comprehensive and clean text corpus of all Throne Speeches.\nProcess: An index of speeches is scraped from the Parliament of Canada website. PDFs of historical speeches are transcribed using the Gemini 1.5 Vision model for high-quality optical character recognition (OCR), while modern speeches are handled through an interactive workflow.\nOutput: A directory of individual speech text files and a master index CSV file.\n\nSegmentation of Throne Speeches using Gemini LLM\n\nObjective: To divide each speech into its distinct rhetorical parts.\nProcess: The Gemini LLM is used to segment the text of each speech into three categories: opening_ceremonial, policy_content, and closing_ceremonial. An interactive review tool allows for verification and correction of any segmentations flagged by the system.\nOutput: A structured, segmented corpus in CSV format, with each sentence categorized.\n\nExploratory Analysis of Throne Speeches\n\nObjective: To uncover broad, high-level patterns in the cleaned text data over time.\nProcess: An initial exploratory data analysis (EDA) is performed on the policy_content sections, examining word frequencies, common phrases, and other basic text statistics by decade.\n\n\n\n\n\n\nBoilerplate Identification\n\nObjective: To identify and isolate recurring, non-substantive formal phrases.\nProcess: The ceremonial sections are analyzed to find common, repeated phrases (n-grams), which are compiled into a “boilerplate dictionary”. This dictionary is then used to filter these structural phrases out of the substantive policy_content.\nOutput: A regular expression (intrusion_regex.rds) containing all identified boilerplate phrases.\n\nLDA Topic Extraction and Analysis\n\nObjective: To discover the hidden thematic structures within the policy content.\nProcess: Several Latent Dirichlet Allocation (LDA) topic models are trained with varying numbers of topics (k). These models are evaluated on metrics of topic quality and temporal balance to select the most coherent and historically representative models for final analysis. The models with k=4 and k=8 topics were chosen as they provided the best trade-off between topic quality and temporal balance.\nOutput: A set of trained LDA models (lda_models.rds).\n\nLLM Interpretation of Topic Models\n\nObjective: To assign meaningful, human-readable labels to the machine-generated topics.\nProcess: To ensure speed and reproducibility, a Large Language Model (Anthropic’s Claude) is prompted to interpret the word clusters for each topic. The LLM provides a concise descriptive label and a one-sentence summary for each topic.\nOutput: A file containing the LLM-generated labels for each topic in each model (llm_topic_labels.rds).\n\n\n\n\n\n\nTopic Shift Analysis & Validation\n\nObjective: To visualize, analyze, and validate the evolution of topics over time.\nProcess: The prominence of each interpreted topic is plotted over time to reveal thematic shifts in Canadian political discourse. The resulting trends are then validated by comparing them against major Canadian historical events and periods of government, confirming that the model captures genuine shifts in political priorities.",
+    "crumbs": [
+      "Overview",
+      "Project Overview",
+      "Statistical Text Mining of Standardized Political Documents"
+    ]
+  },
+  {
+    "objectID": "00-Overview.html#conclusion",
+    "href": "00-Overview.html#conclusion",
+    "title": "Statistical Text Mining of Standardized Political Documents",
+    "section": "",
+    "text": "This pipeline demonstrates that a combination of modern data science tools can effectively uncover and quantify the evolution of political discourse from historical texts. The findings reveal meaningful patterns that align closely with Canada’s historical trajectory, from its early focus on administration and development to its engagement in global conflicts and the recent rise of social and environmental policy concerns.\nNext Step: Scraping and Transcribing Throne Speeches →",
+    "crumbs": [
+      "Overview",
+      "Project Overview",
+      "Statistical Text Mining of Standardized Political Documents"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html",
+    "href": "02_Segmentation.html",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "",
+    "text": "In the previous step, we scraped the Throne Speeches and saved them as text files. In this step we will segment the text. Manually dividing these speeches into their distinct rhetorical sections—the formal opening, the substantive policy agenda, and the ceremonial closing—is a time-consuming and subjective task. We will use Gemini LLM again to streamline the process.\nLLMs are very good but not perfect, so we will break the process into 2 stages:\n\nLLM Segmentation: This stage automates the process by leveraging a Large Language Model (LLM), specifically Google’s Gemini 1.5 Flash, via its API. The script loads a collection of speeches from text files, preprocesses them into a format the AI can understand, and then iteratively calls the Gemini API to identify the boundaries of each section. The final output is a set of structured CSV files, creating a clean, segmented corpus ready for analysis.\nInteractive Review: The first stage identifies potential issue such as, “Low policy content”, “Excessive opening”, “High unclassified content”, etc. The interactive review lets us review the flagged speeches and make corrections by re-classifying sentences as needed.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#overview",
+    "href": "02_Segmentation.html#overview",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "",
+    "text": "In the previous step, we scraped the Throne Speeches and saved them as text files. In this step we will segment the text. Manually dividing these speeches into their distinct rhetorical sections—the formal opening, the substantive policy agenda, and the ceremonial closing—is a time-consuming and subjective task. We will use Gemini LLM again to streamline the process.\nLLMs are very good but not perfect, so we will break the process into 2 stages:\n\nLLM Segmentation: This stage automates the process by leveraging a Large Language Model (LLM), specifically Google’s Gemini 1.5 Flash, via its API. The script loads a collection of speeches from text files, preprocesses them into a format the AI can understand, and then iteratively calls the Gemini API to identify the boundaries of each section. The final output is a set of structured CSV files, creating a clean, segmented corpus ready for analysis.\nInteractive Review: The first stage identifies potential issue such as, “Low policy content”, “Excessive opening”, “High unclassified content”, etc. The interactive review lets us review the flagged speeches and make corrections by re-classifying sentences as needed.",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#setup-and-configuration",
+    "href": "02_Segmentation.html#setup-and-configuration",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "Setup and Configuration",
+    "text": "Setup and Configuration\n\nLoading Libraries\n\n\nShow code\n# Required Libraries\nlibrary(dplyr) # Data manipulation\nlibrary(tidytext) # Text preprocessing and tokenization\nlibrary(httr2) # For API requests\nlibrary(jsonlite) # For JSON handling\nlibrary(readr) # For reading/writing CSV\nlibrary(purrr) # For functional programming\nlibrary(stringr) # For string operations\nlibrary(crayon) # colouring Interactive Console\n\n\nLoading functions and setting up environment variables.\n\n\nShow code\nsource(\"R/functions.R\")\n\nGEMINI_API_KEY &lt;- Sys.getenv(\"GEMINI_API_KEY\")\n\nlog_file &lt;- \"segmentation_log.txt\"\nlog_message(\"Starting throne speech segmentation script\", log_file)\n\n\n[2025-09-06 15:32:10] Starting throne speech segmentation script \n\n\nShow code\noutput_dir &lt;- \"output/segmentation/\"\nif (!dir.exists(output_dir)) {\n  dir.create(output_dir, recursive = TRUE)\n}",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#data-loading-and-preprocessing",
+    "href": "02_Segmentation.html#data-loading-and-preprocessing",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "Data Loading and Preprocessing",
+    "text": "Data Loading and Preprocessing\nThe analysis begins by loading the raw text of the speeches and transforming it into a structured format suitable for the LLM.\nNote: Some functions are in R/functions.R\n\nLoading Speech Files\nload_all_speeches scans the throne_speeches_txt directory for all .txt files. For each file, it reads the content and extracts metadata (like Date: and Parliament:). It then compiles this into a single data frame, with one row per speech.\n\n\nTokenizing Speeches into Sentences\ntokenize_speeches: Once loaded, the raw text of each speech is tokenized into individual sentences using tidytext::unnest_tokens. Each sentence is then numbered, creating a “numbered list” format that we will provide to the AI for easy reference. This step produces two key data frames: one with every sentence as a row, and another that collapses the numbered sentences back into a single text block for each speech.\n\n\nShow code\n# Function to Clean and Tokenize Speeches into Sentences\ntokenize_speeches &lt;- function(speeches_df, log_file) {\n  log_message(\"Starting tokenization of speeches\", log_file)\n  speeches_sentences &lt;- speeches_df %&gt;%\n    mutate(\n      clean_text = str_replace_all(\n        speech_text,\n        \"[\\u201C\\u201D\\u2018\\u2019\\u201A\\u201E\\u2026\\u2013\\u2014]\",\n        \"'\"\n      ) %&gt;%\n        str_replace_all(\"\\\\s+\", \" \") %&gt;%\n        str_trim()\n    ) %&gt;%\n    unnest_tokens(\n      sentence,\n      clean_text,\n      token = \"sentences\",\n      to_lower = FALSE\n    ) %&gt;%\n    filter(str_length(sentence) &gt; 10) %&gt;%\n    group_by(filename) %&gt;%\n    mutate(\n      sentence_id = row_number(),\n      sentence_position = sentence_id / max(sentence_id),\n      numbered_text = paste(sentence_id, sentence, sep = \": \")\n    ) %&gt;%\n    ungroup()\n\n  speeches_numbered &lt;- speeches_sentences %&gt;%\n    group_by(filename, date, year, parliament, text_length) %&gt;%\n    summarise(\n      full_numbered_text = paste(numbered_text, collapse = \"\\n\"),\n      total_sentences = n(),\n      .groups = \"drop\"\n    )\n\n  log_message(\n    paste(\n      \"Tokenized\",\n      nrow(speeches_numbered),\n      \"speeches into\",\n      sum(speeches_numbered$total_sentences),\n      \"sentences\"\n    ),\n    log_file\n  )\n  write_csv(\n    speeches_sentences,\n    \"output/segmentation/intermediate_sentences.csv\"\n  )\n  write_csv(speeches_numbered, \"output/segmentation/intermediate_numbered.csv\")\n  return(list(sentences = speeches_sentences, numbered = speeches_numbered))\n}",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#interacting-with-the-gemini-api",
+    "href": "02_Segmentation.html#interacting-with-the-gemini-api",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "Interacting with the Gemini API",
+    "text": "Interacting with the Gemini API\nprocess_speech_with_gemini is the core of this stage, where we communicate with the Gemini LLM the following prompt:\n\nSegment this full throne speech into three sections:\n1. OPENING_CEREMONIAL: Formal protocol, addresses, historical acknowledgments, and introductory remarks (typically the first few paragraphs).\n2. POLICY_CONTENT: Specific government agendas, commitments, and policy details (the bulk, often starting with phrases like “Our Government will…” or “My Government will…”).\n3. CLOSING_CEREMONIAL: Formal conclusion, blessings, or prorogation notes (typically the last paragraph).\nProvide the output as a JSON object with keys:\n- sections: An object with keys ‘opening_ceremonial’, ‘policy_content’, ‘closing_ceremonial’, each containing:\n- start_sentence_id: Integer (1-based)\n- end_sentence_id: Integer (1-based)\n- transition_markers: Array of strings (any identified transition phrases, e.g., “Honourable Senators”, “My Government will”, “May Divine Providence”)\nEnsure the output is ONLY a single, valid JSON object with no extra text or formatting.\n\n\nThe Main Processing Loop\nThe segment_speeches_llm function orchestrates the entire segmentation process. It iterates through each speech, calling process_speech_with_gemini for each one.\n\n\nShow code\nsegment_speeches_llm &lt;- function(\n  speeches_numbered,\n  api_key,\n  max_retries = 3,\n  sleep_time = 2,\n  log_file\n) {\n  log_message(\"Starting LLM segmentation\", log_file)\n  # Load existing segmented results if available\n  segmented_list &lt;- if (\n    file.exists(\"throne_speeches/intermediate_segmented_list.rds\")\n  ) {\n    readRDS(\"throne_speeches/intermediate_segmented_list.rds\")\n  } else {\n    list()\n  }\n  failed_speeches &lt;- data.frame(filename = character(), error = character())\n\n  # Filter unprocessed speeches\n  speeches_to_process &lt;- speeches_numbered %&gt;%\n    filter(!filename %in% names(segmented_list))\n  log_message(\n    paste(\n      \"Processing\",\n      nrow(speeches_to_process),\n      \"unprocessed speeches\"\n    ),\n    log_file\n  )\n\n  for (i in 1:nrow(speeches_to_process)) {\n    row &lt;- speeches_to_process[i, ]\n    attempt &lt;- 1\n    result &lt;- NULL\n\n    while (is.null(result) && attempt &lt;= max_retries) {\n      log_message(paste(\"Attempt\", attempt, \"for\", row$filename), log_file)\n      result &lt;- process_speech_with_gemini(\n        row$full_numbered_text,\n        row$filename,\n        api_key,\n        log_file = log_file\n      )\n      if (is.null(result)) {\n        log_message(\n          paste(\n            \"Retrying\",\n            row$filename,\n            \"after\",\n            sleep_time,\n            \"seconds\"\n          ),\n          log_file\n        )\n        Sys.sleep(sleep_time)\n        attempt &lt;- attempt + 1\n      }\n    }\n\n    if (is.null(result)) {\n      failed_speeches &lt;- rbind(\n        failed_speeches,\n        data.frame(filename = row$filename, error = \"Failed after max retries\")\n      )\n    }\n    segmented_list[[row$filename]] &lt;- result\n\n    if (i %% 10 == 0) {\n      log_message(\n        paste(\n          \"...processed\",\n          i,\n          \"of\",\n          nrow(speeches_to_process),\n          \"speeches...\"\n        ),\n        log_file\n      )\n    }\n  }\n\n  log_message(\n    paste(\n      \"Completed LLM segmentation for\",\n      length(segmented_list),\n      \"speeches\"\n    ),\n    log_file\n  )\n  write_csv(failed_speeches, \"output/segmentation/failed_speeches.csv\")\n  saveRDS(segmented_list, \"output/segmentation/intermediate_segmented_list.rds\")\n  return(segmented_list)\n}\n\n\n\n\nCompiling Results and Generating Outputs\nAfter the API calls are complete, the script’s final phase is to transform the raw JSON responses from the AI into the final, usable CSV files. compile_segmented_data takes the list of results returned by the API and joins it back to our sentence-by-sentence data frame. It uses the start_sentence_id and end_sentence_id provided by the AI for each section to label every sentence with its corresponding category (opening_ceremonial, policy_content, etc.).\n\n\nShow code\n# Compile Segmented Data into Sentence-Level Dataframe\ncompile_segmented_data &lt;- function(\n  speeches_sentences,\n  segmented_list,\n  log_file\n) {\n  log_message(\"Compiling segmented data\", log_file)\n  segmented_data &lt;- speeches_sentences %&gt;%\n    rowwise() %&gt;%\n    mutate(\n      llm_result = list(segmented_list[[filename]]),\n      opening_start = llm_result$sections$opening_ceremonial$start_sentence_id %||%\n        NA,\n      opening_end = llm_result$sections$opening_ceremonial$end_sentence_id %||%\n        NA,\n      policy_start = llm_result$sections$policy_content$start_sentence_id %||%\n        NA,\n      policy_end = llm_result$sections$policy_content$end_sentence_id %||% NA,\n      closing_start = llm_result$sections$closing_ceremonial$start_sentence_id %||%\n        NA,\n      closing_end = llm_result$sections$closing_ceremonial$end_sentence_id %||%\n        NA,\n      section = case_when(\n        is.na(opening_start) | is.na(policy_start) | is.na(closing_start) ~\n          \"unclassified\",\n        between(sentence_id, opening_start, opening_end) ~ \"opening_ceremonial\",\n        between(sentence_id, policy_start, policy_end) ~ \"policy_content\",\n        between(sentence_id, closing_start, closing_end) ~ \"closing_ceremonial\",\n        TRUE ~ \"unclassified\"\n      )\n    ) %&gt;%\n    ungroup()\n\n  log_message(\"Completed compilation of segmented data\", log_file)\n  return(segmented_data)\n}\n\n\n\n\nGenerating Final Output Files\nThe generate_segmented_outputs function creates the final deliverables. It aggregates the sentence-level data to produce several summary tables: a clean corpus with one row per speech, a high-level summary of section proportions, and a list of speeches flagged for potential review.\n\n\nShow code\ngenerate_segmented_outputs &lt;- function(segmented_data, log_file) {\n  log_message(\n    \"Generating outputs: summaries, corpus, validation, and issues\",\n    log_file\n  )\n\n  # Speech Summaries\n  speech_summaries &lt;- segmented_data %&gt;%\n    group_by(filename, date, year, parliament) %&gt;%\n    summarise(\n      total_sentences = n(),\n      opening_sentences = sum(section == \"opening_ceremonial\"),\n      policy_sentences = sum(section == \"policy_content\"),\n      closing_sentences = sum(section == \"closing_ceremonial\"),\n      unclassified_sentences = sum(section == \"unclassified\"),\n      .groups = \"drop\"\n    ) %&gt;%\n    mutate(\n      opening_pct = round(100 * opening_sentences / total_sentences, 1),\n      policy_pct = round(100 * policy_sentences / total_sentences, 1),\n      closing_pct = round(100 * closing_sentences / total_sentences, 1),\n      unclassified_pct = round(\n        100 * unclassified_sentences / total_sentences,\n        1\n      ),\n      era = case_when(\n        year &lt;= 1920 ~ \"Early Confederation\",\n        year &lt;= 1960 ~ \"Mid-20th Century\",\n        year &lt;= 1990 ~ \"Late 20th Century\",\n        TRUE ~ \"Contemporary\"\n      )\n    )\n\n  # Clean Corpus\n  clean_corpus &lt;- segmented_data %&gt;%\n    group_by(filename, date, year, parliament) %&gt;%\n    summarise(\n      opening_ceremonial = paste(\n        sentence[section == \"opening_ceremonial\"],\n        collapse = \" \"\n      ),\n      policy_content = paste(\n        sentence[section == \"policy_content\"],\n        collapse = \" \"\n      ),\n      closing_ceremonial = paste(\n        sentence[section == \"closing_ceremonial\"],\n        collapse = \" \"\n      ),\n      opening_sentence_count = sum(section == \"opening_ceremonial\"),\n      policy_sentence_count = sum(section == \"policy_content\"),\n      closing_sentence_count = sum(section == \"closing_ceremonial\"),\n      opening_word_count = str_count(opening_ceremonial, \"\\\\S+\") %||% 0,\n      policy_word_count = str_count(policy_content, \"\\\\S+\") %||% 0,\n      closing_word_count = str_count(closing_ceremonial, \"\\\\S+\") %||% 0,\n      total_sentences = n(),\n      .groups = \"drop\"\n    ) %&gt;%\n    mutate(\n      era = case_when(\n        year &lt;= 1920 ~ \"Early Confederation\",\n        year &lt;= 1960 ~ \"Mid-20th Century\",\n        year &lt;= 1990 ~ \"Late 20th Century\",\n        TRUE ~ \"Contemporary\"\n      ),\n      decade = paste0(floor(year / 10) * 10, \"s\"),\n      policy_content_clean = str_replace_all(\n        policy_content,\n        \"[\\u201C\\u201D\\u2018\\u2019\\u201A\\u201E\\u2026\\u2013\\u2014]\",\n        \"'\"\n      ) %&gt;%\n        str_replace_all(\"\\\\s+\", \" \") %&gt;%\n        str_trim(),\n      unclassified_sentences = total_sentences -\n        (opening_sentence_count +\n          policy_sentence_count +\n          closing_sentence_count),\n      needs_review = policy_sentence_count &lt; 5 |\n        policy_word_count &lt; 100 |\n        unclassified_sentences &gt; 0\n    )\n\n  # Validation by Era (This will now work correctly)\n  validation_stats &lt;- speech_summaries %&gt;%\n    group_by(era) %&gt;%\n    summarise(\n      n_speeches = n(),\n      avg_opening_pct = round(mean(opening_pct, na.rm = TRUE), 1),\n      avg_policy_pct = round(mean(policy_pct, na.rm = TRUE), 1),\n      avg_closing_pct = round(mean(closing_pct, na.rm = TRUE), 1),\n      avg_unclassified_pct = round(mean(unclassified_pct, na.rm = TRUE), 1),\n      .groups = \"drop\"\n    )\n\n  # Flag Issues\n  issues &lt;- speech_summaries %&gt;%\n    mutate(\n      issue = case_when(\n        policy_pct &lt; 40 ~ \"Low policy content\",\n        opening_pct &gt; 40 ~ \"Excessive opening\",\n        closing_pct &gt; 40 ~ \"Excessive closing\",\n        policy_sentences &lt; 10 ~ \"Very few policy sentences\",\n        unclassified_pct &gt; 10 ~ \"High unclassified content\",\n        TRUE ~ \"OK\"\n      )\n    ) %&gt;%\n    filter(issue != \"OK\")\n\n  log_message(\n    paste(\n      \"Generated outputs:\",\n      nrow(speech_summaries),\n      \"summaries,\",\n      nrow(clean_corpus),\n      \"corpus entries,\",\n      nrow(issues),\n      \"issues flagged\"\n    ),\n    log_file\n  )\n  return(list(\n    summaries = speech_summaries,\n    corpus = clean_corpus,\n    validation = validation_stats,\n    issues = issues\n  ))\n}\n\n\n\n\nExecution\nThis is the main execution block that runs the entire process from start to finish. The functions defined in the previous steps are called in logical order.\nNote: This code chunk is set to eval=FALSE by default to prevent it from automatically running when you render the document.\n\n\nShow code\n# Main Execution\nmain &lt;- function(base_dir = \"output/throne_speeches_txt\", api_key) {\n  log_message(\"=== Starting Main Execution ===\", log_file)\n\n  # Step 1: Load speeches\n  speeches_df &lt;- load_all_speeches(base_dir, log_file)\n\n  # Step 2: Tokenize and prepare numbered text\n  tokenized &lt;- tokenize_speeches(speeches_df, log_file)\n  speeches_sentences &lt;- tokenized$sentences\n  speeches_numbered &lt;- tokenized$numbered\n\n  # Step 3: Process with Gemini API\n  segmented_list &lt;- segment_speeches_llm(\n    speeches_numbered,\n    api_key,\n    log_file = log_file\n  )\n\n  # Step 4: Compile segmented data\n  segmented_data &lt;- compile_segmented_data(\n    speeches_sentences,\n    segmented_list,\n    log_file\n  )\n\n  # Step 5: Generate outputs\n  outputs &lt;- generate_segmented_outputs(segmented_data, log_file)\n\n  # Save results\n  log_message(\"Saving output files\", log_file)\n  write_csv(segmented_data, \"output/segmentation/llm_detailed_segmentation.csv\")\n  write_csv(\n    outputs$corpus,\n    \"output/segmentation/llm_clean_segmented_corpus.csv\"\n  )\n  write_csv(outputs$summaries, \"output/segmentation/llm_speech_summaries.csv\")\n  write_csv(outputs$validation, \"output/segmentation/llm_validation_stats.csv\")\n  write_csv(outputs$issues, \"output/segmentation/llm_issues.csv\")\n\n  # Print summaries\n  cat(\"\\n=== FINAL CORPUS SUMMARY ===\\n\")\n  print(\n    outputs$summaries %&gt;%\n      select(\n        filename,\n        year,\n        opening_pct,\n        policy_pct,\n        closing_pct,\n        unclassified_pct\n      ) %&gt;%\n      head()\n  )\n\n  cat(\"\\n=== VALIDATION BY ERA ===\\n\")\n  print(outputs$validation)\n\n  cat(\"\\n=== SPEECHES FLAGGED FOR REVIEW ===\\n\")\n  cat(\n    \"Number flagged:\",\n    nrow(outputs$issues),\n    \"out of\",\n    nrow(outputs$summaries),\n    \"speeches\\n\"\n  )\n  if (nrow(outputs$issues) &gt; 0) {\n    print(outputs$issues %&gt;% select(filename, year, issue))\n  }\n\n  log_message(\"=== Script Execution Completed ===\", log_file)\n  return(list(\n    segmented_data = segmented_data,\n    outputs = outputs\n  ))\n}\n\nresults &lt;- main(\n  base_dir = \"output/throne_speeches_txt\",\n  api_key = GEMINI_API_KEY\n)",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#interactive-review-of-identified-issues",
+    "href": "02_Segmentation.html#interactive-review-of-identified-issues",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "Interactive Review of Identified Issues",
+    "text": "Interactive Review of Identified Issues\nAn interactive tool to review and correct LLM-based speech segmentations. The script loops through the speeches identified and recorded in llm_issues.csv. The screenshot below illustrates the options available.\n\n\n\nScreenshot of the main menu for the interactive console review script below\n\n\nNote: The script below will only run on R console (most IDEs should be fine. I used Positron with no issues).\n\n\nShow code\nsource(\"R/interactive_segmentation_review.R\")",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "02_Segmentation.html#conclusion",
+    "href": "02_Segmentation.html#conclusion",
+    "title": "Segmentation of Throne Speeches using Gemini LLM",
+    "section": "Conclusion",
+    "text": "Conclusion\nIn this step, we segmented the sentences using a two-stage approach where we ask an LLM to segment our text. We used logical thresholds to identify issues for review. Reviewed and made corrections.\nNext Step: Exploratory Analysis of Throne Speeches →",
+    "crumbs": [
+      "Overview",
+      "Data Collection & Preparation",
+      "Segmentation of Throne Speeches using Gemini LLM"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html",
+    "href": "04_Boilerplate_Identification.html",
+    "title": "Boilerplate Identification",
+    "section": "",
+    "text": "This document implements Phase 2 of the Throne Speech Cultural Analysis Workflow: Refined Boilerplate Identification. The primary goal is to analyze the ceremonial sections of the speeches to create a “boilerplate dictionary”. This dictionary will contain recurring, formal phrases that are structural rather than substantive.\nThis process involves:\n\nIsolating the ceremonial text from the segmented corpus.\n\nPerforming n-gram frequency analysis to find common phrases.\n\nAnalyzing document frequency to find pervasive phrases that appear in most speeches.\n\nCompiling the results into a final dictionary.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#overview",
+    "href": "04_Boilerplate_Identification.html#overview",
+    "title": "Boilerplate Identification",
+    "section": "",
+    "text": "This document implements Phase 2 of the Throne Speech Cultural Analysis Workflow: Refined Boilerplate Identification. The primary goal is to analyze the ceremonial sections of the speeches to create a “boilerplate dictionary”. This dictionary will contain recurring, formal phrases that are structural rather than substantive.\nThis process involves:\n\nIsolating the ceremonial text from the segmented corpus.\n\nPerforming n-gram frequency analysis to find common phrases.\n\nAnalyzing document frequency to find pervasive phrases that appear in most speeches.\n\nCompiling the results into a final dictionary.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#setup-and-data-preparation",
+    "href": "04_Boilerplate_Identification.html#setup-and-data-preparation",
+    "title": "Boilerplate Identification",
+    "section": "Setup and Data Preparation",
+    "text": "Setup and Data Preparation\nFirst, we load the necessary libraries and the clean, segmented corpus. We’ll then create a dedicated corpus containing only the ceremonial text for our analysis.\n\n\nShow code\nset.seed(1867)\n\n# Load libraries\nlibrary(dplyr)\nlibrary(tidytext)\nlibrary(tidyr)\nlibrary(stringr)\nlibrary(ggplot2)\n\nsource(\"R/functions.R\")\n\n# Load the segmented corpus\nclean_corpus &lt;- readr::read_csv(\n  \"output/segmentation/llm_clean_segmented_corpus.csv\"\n)\n\nceremonial_corpus &lt;- clean_corpus %&gt;%\n  select(filename, year, opening_ceremonial, closing_ceremonial) %&gt;%\n  mutate(ceremonial_text = paste(opening_ceremonial, closing_ceremonial))\n\ntotal_docs &lt;- nrow(ceremonial_corpus)",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#stopwords",
+    "href": "04_Boilerplate_Identification.html#stopwords",
+    "title": "Boilerplate Identification",
+    "section": "Stopwords",
+    "text": "Stopwords\nStopwords are commonly removed during text preprocessing because they appear frequently across documents but carry little semantic meaning that distinguishes one text from another - words like “the,” “and,” “is,” and “of” typically don’t contribute to understanding the core topics or sentiment of a document. The get_project_stopwords function combines a standard set of stopwords (tidytext::get_stopwords()), with custom ones that appear with high frequency in throne speeches but don’t help us identify topics.\n\n\nCustom Stopwords: \n\n\n [1] \"act\"        \"also\"       \"new\"        \"year\"       \"years\"     \n [6] \"measures\"   \"asked\"      \"national\"   \"make\"       \"continue\"  \n[11] \"provide\"    \"increase\"   \"great\"      \"ensure\"     \"need\"      \n[16] \"made\"       \"well\"       \"must\"       \"take\"       \"canada\"    \n[21] \"canada's\"   \"canadians\"  \"canadian\"   \"s\"          \"government\"\n[26] \"nation\"     \"dominion\"   \"bill\"       \"policy\"     \"minister\"",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#a-unified-analysis-of-phrase-proportionality",
+    "href": "04_Boilerplate_Identification.html#a-unified-analysis-of-phrase-proportionality",
+    "title": "Boilerplate Identification",
+    "section": "A Unified Analysis of Phrase Proportionality",
+    "text": "A Unified Analysis of Phrase Proportionality\nTo create a robust boilerplate dictionary, we will analyze n-grams from both ceremonial and policy texts simultaneously. We will identify phrases that are both highly pervasive across all speeches and disproportionately found in ceremonial sections. We do so using analyze_ceremony_ngrams function which takes in the size of the n-gram” (number of words), in our case 2 and 3, the corpora and the stopwords regex, we prepared at the beginning, and returns a summary dataset comparing n-gram usage. The table below, shows the top 12 n-grams.\n\n\nShow code\n#  Run the Analysis for N=2, 3\nall_ngrams_summary &lt;- purrr::map_dfr(\n  c(2, 3),  # &lt;- n-grams 2 and 3\n  analyze_ceremony_ngrams, # &lt;- THIS IS WHERE THE FUNCTION IS CALLED\n  ceremonial_corpus, clean_corpus, stopword_regex # &lt;- Other function arguments\n) %&gt;%\n  select(\n    ngram,\n    n_size,\n    pervasiveness_pct,\n    ceremonial_proportion,\n    df_ceremonial,\n    df_policy\n  ) %&gt;%\n  arrange(desc(pervasiveness_pct))\n\nknitr::kable(head(all_ngrams_summary, 12))\n\n\n\n\n\n\n\n\n\n\n\n\n\nngram\nn_size\npervasiveness_pct\nceremonial_proportion\ndf_ceremonial\ndf_policy\n\n\n\n\ngovernor general\n2\n92.10526\n1.0000000\n140\n36\n\n\nblack rod\n2\n86.18421\n0.9847328\n129\n2\n\n\nspeaker commanded\n2\n86.18421\n0.9847328\n129\n2\n\n\ngentleman usher\n2\n85.52632\n0.9846154\n128\n2\n\n\ngracious speech\n2\n80.92105\n0.7642276\n94\n29\n\n\nsenate chamber\n2\n73.02632\n1.0000000\n111\n1\n\n\ndivine providence\n2\n61.84211\n0.9680851\n91\n4\n\n\nhonourable members\n2\n57.23684\n0.9770115\n85\n20\n\n\nunited states\n2\n57.23684\n0.0919540\n8\n85\n\n\nsenate members\n2\n53.94737\n0.9634146\n79\n18\n\n\nfollows honourable\n2\n46.71053\n0.7746479\n55\n16\n\n\nobedient servant\n2\n42.76316\n1.0000000\n65\n0\n\n\n\n\n\nVisualizing the results, this plot makes the trade-off clear. We are looking for phrases in the top-right quadrant.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#creating-the-dictionary",
+    "href": "04_Boilerplate_Identification.html#creating-the-dictionary",
+    "title": "Boilerplate Identification",
+    "section": "Creating the Dictionary",
+    "text": "Creating the Dictionary\nWith these thresholds clearly defined, creating the dictionary is a simple, justifiable filtering step.\n\nLower PERVASIVENESS_THRESHOLD includes rarer phrases.\nLower PROPORTIONALITY_THRESHOLD includes phrases that are less purely ceremonial.\n\n\n\nShow code\n# - Lower PERVASIVENESS_THRESHOLD to include rarer phrases.\n# - Lower PROPORTIONALITY_THRESHOLD to include phrases that are less purely ceremonial.\nPERVASIVENESS_THRESHOLD &lt;- 10 # Lowered to 10% to catch more phrases\nPROPORTIONALITY_THRESHOLD &lt;- 0.6 # At least 60% of its appearances must be ceremonial\n\n# Create the Dictionary\nintrusion_dictionary_df &lt;- all_ngrams_summary %&gt;%\n  filter(\n    pervasiveness_pct &gt;= PERVASIVENESS_THRESHOLD,\n    ceremonial_proportion &gt;= PROPORTIONALITY_THRESHOLD,\n    df_policy &gt; 0\n  ) %&gt;%\n  # Sort by n-gram size (longest first) to handle overlaps\n  arrange(desc(n_size))\n\n# Create the final regex from the sorted ngram column\nintrusion_regex &lt;- paste(intrusion_dictionary_df$ngram, collapse = \"|\")\n\n\n\n\nFinal Intrusion Dictionary created with 93 phrases.\n\n\n\n\n\n\n\n\n\n\n\n\n\nngram\nn_size\npervasiveness_pct\nceremonial_proportion\ndf_ceremonial\ndf_policy\n\n\n\n\nfollows honourable members\n3\n40.78947\n0.8225806\n51\n11\n\n\nmay divine providence\n3\n36.84211\n0.9821429\n55\n1\n\n\nbritish north america\n3\n28.28947\n0.6976744\n30\n15\n\n\ncommons whose servant\n3\n26.31579\n0.9500000\n38\n2\n\n\nduties thus assigned\n3\n26.31579\n0.9750000\n39\n1\n\n\nimportant duties thus\n3\n26.31579\n0.9750000\n39\n1\n\n\nknight grand cross\n3\n25.65789\n0.9743590\n38\n1\n\n\ndivine providence guide\n3\n23.02632\n0.9714286\n34\n1\n\n\ncountry humbly claim\n3\n22.36842\n0.9705882\n33\n1\n\n\nproceedings may receive\n3\n22.36842\n0.9705882\n33\n1\n\n\ndivine providence may\n3\n16.44737\n0.9600000\n24\n1\n\n\nparliament honourable members\n3\n15.13158\n0.9565217\n22\n1",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#applying-the-dictionary-to-filter-policy-content",
+    "href": "04_Boilerplate_Identification.html#applying-the-dictionary-to-filter-policy-content",
+    "title": "Boilerplate Identification",
+    "section": "Applying the Dictionary to Filter Policy Content",
+    "text": "Applying the Dictionary to Filter Policy Content\nFinally, we can demonstrate how to use this dictionary to filter these ceremonial phrases out of the policy_content section, as described in step 2.3 of the plan. This leaves a cleaner text for deeper thematic analysis later.\n\n\n--- ORIGINAL TEXT (Excerpt) ---\n Honourable Gentlemen of the Senate : Gentlemen of the House of Commons: It is\nwith much satisfaction that I again have recourse to your advice and assistance\nin the administration of the affairs of the Dominion. By the sudden and lamented\ndeath of the late Right Honourable Sir John Thompson, Cana... \n\n--- FILTERED TEXT (Excerpt) ---\n of the Senate : Gentlemen of the House of Commons: It is with much satisfaction\nthat I again have recourse to your advice and assistance in the administration\nof the affairs of the Dominion. By the sudden and lamented death of the late\nJohn Thompson, Canada has sustained a grievous loss. The de... \n\n\n\n\n\nBreakdown of Average Word Counts After Cleaning Steps by Decade\n\n\n\n\n\n\n\n\n\n\n\n\nDecade\nAvg. Total Words\nStopwords Removed\nStopwords Removed (%)\nBoilerplate Removed\nBoilerplate Removed (%)\nSubstantive Words\nSubstantive Words (%)\n\n\n\n\n1860s\n322.0\n176.5\n54.8\n1.0\n0.3\n144.5\n44.9\n\n\n1870s\n808.1\n458.9\n56.8\n6.9\n0.9\n342.3\n42.4\n\n\n1880s\n694.5\n389.8\n56.1\n2.5\n0.4\n302.2\n43.5\n\n\n1890s\n578.4\n327.0\n56.5\n3.5\n0.6\n247.8\n42.8\n\n\n1900s\n711.5\n389.5\n54.7\n5.8\n0.8\n316.2\n44.4\n\n\n1910s\n641.5\n354.0\n55.2\n5.9\n0.9\n281.6\n43.9\n\n\n1920s\n934.0\n499.4\n53.5\n5.1\n0.5\n429.5\n46.0\n\n\n1930s\n874.9\n465.6\n53.2\n4.8\n0.6\n404.5\n46.2\n\n\n1940s\n927.8\n489.3\n52.7\n7.8\n0.8\n430.7\n46.4\n\n\n1950s\n953.1\n514.8\n54.0\n2.5\n0.3\n435.9\n45.7\n\n\n1960s\n2176.2\n1168.6\n53.7\n5.0\n0.2\n1002.5\n46.1\n\n\n1970s\n2398.8\n1229.8\n51.3\n3.8\n0.2\n1165.2\n48.6\n\n\n1980s\n3170.7\n1583.5\n49.9\n5.7\n0.2\n1581.5\n49.9\n\n\n1990s\n3584.6\n1852.6\n51.7\n6.2\n0.2\n1725.8\n48.1\n\n\n2000s\n3576.0\n1808.4\n50.6\n3.4\n0.1\n1764.2\n49.3\n\n\n2010s\n3612.0\n1793.2\n49.6\n4.0\n0.1\n1814.8\n50.2\n\n\n2020s\n3460.3\n1697.3\n49.1\n6.3\n0.2\n1756.7\n50.8\n\n\n\n\n\nWe observe that the Substantive Words (%) is about the same over the decades, ranging from 41.6 to 49.5. We can interpret this as an indication that our boilerplate + stopwords filter is general enough to have a similar impact. We might attribute the slight increase in Substantive words overtime as a function of the overall speech content increases over time.",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#save-intrusion-dictionary-regex",
+    "href": "04_Boilerplate_Identification.html#save-intrusion-dictionary-regex",
+    "title": "Boilerplate Identification",
+    "section": "Save Intrusion Dictionary & Regex",
+    "text": "Save Intrusion Dictionary & Regex\n\nSaving intrusion_dictionary.csv, dictionary phrases as a CSV for easy inspection.\nSaving intrusion_regex.rds, regex string as an RDS file for efficient use in R.\n\n\n\nShow code\noutput_dir &lt;- \"output/boilerplate/\"\nif (!dir.exists(output_dir)) {\n  dir.create(output_dir, recursive = TRUE)\n}\nreadr::write_csv(\n  intrusion_dictionary_df,\n  file.path(output_dir, \"intrusion_dictionary.csv\")\n)\nsaveRDS(\n  intrusion_regex,\n  file = file.path(output_dir, \"intrusion_regex.rds\")\n)",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "04_Boilerplate_Identification.html#conclusion",
+    "href": "04_Boilerplate_Identification.html#conclusion",
+    "title": "Boilerplate Identification",
+    "section": "Conclusion",
+    "text": "Conclusion\nThe dictionary successfully removes the target phrases, demonstrating its utility for future analysis phases where we need to isolate purely policy-related text.\nNext Step: LDA Topic Extraction and Analysis →",
+    "crumbs": [
+      "Overview",
+      "Natural Language Processing",
+      "Boilerplate Identification"
+    ]
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html",
+    "href": "06_Topics_Interpretation.html",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "",
+    "text": "This document uses a Large Language Model (LLM) to interpret the topics generated by our LDA models in the previous step. The ‘topics’ generated by the models are collections of statistically related words. While these may be meaningful to a subject-matter expert, manual interpretation is a laborious process that can lead to inevitable subjectivity. We therefore chose to use an LLM to automate this step, prioritizing speed and reproducibility.\nFor this task, we selected Anthropic’s Claude model, which has a reputation for nuanced cultural and historical interpretation. We’ll use its API to interpret the topics from each of our k models, providing it with the highest-probability words (ranked by their beta values) for each topic."
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#overview",
+    "href": "06_Topics_Interpretation.html#overview",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "",
+    "text": "This document uses a Large Language Model (LLM) to interpret the topics generated by our LDA models in the previous step. The ‘topics’ generated by the models are collections of statistically related words. While these may be meaningful to a subject-matter expert, manual interpretation is a laborious process that can lead to inevitable subjectivity. We therefore chose to use an LLM to automate this step, prioritizing speed and reproducibility.\nFor this task, we selected Anthropic’s Claude model, which has a reputation for nuanced cultural and historical interpretation. We’ll use its API to interpret the topics from each of our k models, providing it with the highest-probability words (ranked by their beta values) for each topic."
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#setup",
+    "href": "06_Topics_Interpretation.html#setup",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "Setup",
+    "text": "Setup\nFirst, we load the necessary libraries and data.\n\n\nShow code\n# Seed\nset.seed(1867)\n\n# Load libraries\nlibrary(dplyr)\nlibrary(tidytext)\nlibrary(tidyr)\nlibrary(stringr)\nlibrary(ggplot2)\nlibrary(topicmodels)\nlibrary(purrr)\nlibrary(httr2)\nlibrary(jsonlite)\nlibrary(readr)\nlibrary(kableExtra)\n\n# Load project-specific functions\n# Get more detailed error\ntryCatch(\n  {\n    source(\"R/functions.R\")\n  },\n  error = function(e) {\n    cat(\"Detailed error:\\n\")\n    cat(\"Message:\", e$message, \"\\n\")\n    cat(\"Call:\", deparse(e$call), \"\\n\")\n  }\n)\n\n# Load trained models and corpus metadata\nlda_models &lt;- readRDS(\"output/models/lda_models.rds\")\nk_values &lt;- c(4, 8)\n\n# Set up API Key\nANTHROPIC_API_KEY &lt;- Sys.getenv(\"ANTHROPIC_API_KEY\")"
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#prompt-engineering-for-interpretation",
+    "href": "06_Topics_Interpretation.html#prompt-engineering-for-interpretation",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "Prompt Engineering for Interpretation",
+    "text": "Prompt Engineering for Interpretation\nWe create a new function interpret_topic_set_with_llm that formats the top words from all topics in a model into a single prompt. The prompt instructs the LLM to return a JSON array, with one object for each topic’s interpretation.\n\nPrompt:\n\n\nShow code\nYou are an expert political historian specializing in Canadian policy. \nI have a set of {k_value} topics from a topic model of Canadian Throne Speeches. \nYour task is to provide a concise interpretation for EACH topic based on its most probable words, considering the context of the other topics.\n\nHere is the full set of topics and their words: {topics_words}\n\nPlease provide your response as a valid JSON array (and ONLY the JSON array, no markdown formatting or extra text). \n\nEach element should be an object with these three keys:\n1. 'topic_id': The integer topic number.\n2. 'label': A short, descriptive topic label of 3-5 words (e.g., 'National Defense & Foreign Affairs').\n3. 'focus': A single sentence describing the policy area this topic represents.\n\nReturn only the JSON array, starting with [ and ending with ]:"
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#iteratively-interpret-each-topic-set",
+    "href": "06_Topics_Interpretation.html#iteratively-interpret-each-topic-set",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "Iteratively Interpret Each Topic Set",
+    "text": "Iteratively Interpret Each Topic Set\nNow we’ll loop through each model, making a call using interpret_topic_set_with_llm, and parse the JSON array result.\nNote: To reproduce this part you must have an API key with Anthropic. It is not free but $5 credit (the minimum amount) should be enough. Running this loop several times during testing, cost about $0.15. It should not be hard to convert the function to another LLM if cost is an issue.\n\n\nShow code\n# This code iterates through each MODEL\nllm_interpretations &lt;- purrr::map2_dfr(\n  lda_models,\n  k_values,\n  function(model, k) {\n    # Get the top 15 terms for all topics in THIS model\n    topics_for_model &lt;- tidy(model, matrix = \"beta\") %&gt;%\n      group_by(topic) %&gt;%\n      slice_max(beta, n = 25) %&gt;%\n      summarise(terms = paste(term, collapse = \", \"), .groups = \"drop\")\n\n    result &lt;- interpret_topic_set_with_llm(\n      k,\n      topics_for_model,\n      ANTHROPIC_API_KEY\n    )\n\n    if (!is.null(result$error)) {\n      log_message(\n        paste(\"API ERROR for k=\", k, \":\", result$error),\n        \"llm_interpretation_log.txt\"\n      )\n      return(tibble(\n        k = k,\n        topic = NA,\n        label = \"API_ERROR\",\n        focus = result$error\n      ))\n    }\n\n    json_text &lt;- result$content[[1]]$text\n\n    log_message(\n      paste(\"Raw response for k=\", k, \":\", substr(json_text, 1, 200), \"...\"),\n      \"llm_interpretation_log.txt\"\n    )\n\n    clean_json &lt;- clean_json_response(json_text)\n\n    parsed_json &lt;- tryCatch(\n      {\n        fromJSON(clean_json, flatten = TRUE)\n      },\n      error = function(e) {\n        log_message(\n          paste(\n            \"JSON parsing error for k=\",\n            k,\n            \":\",\n            e$message,\n            \"\\nCleaned JSON:\",\n            clean_json\n          ),\n          \"llm_interpretation_log.txt\"\n        )\n        return(NULL)\n      }\n    )\n\n    if (is.null(parsed_json)) {\n      return(tibble(\n        k = k,\n        topic = NA,\n        label = \"JSON_PARSE_ERROR\",\n        focus = \"Could not parse JSON response\"\n      ))\n    }\n\n    # Return a tidy data frame, adding the k-value and topic words\n    parsed_json %&gt;%\n      as_tibble() %&gt;%\n      rename(topic = topic_id) %&gt;%\n      mutate(k = k) %&gt;%\n      left_join(topics_for_model, by = \"topic\")\n  }\n)\n\n# Save the resulting interpretations\nsaveRDS(llm_interpretations, \"output/models/llm_topic_labels.rds\")"
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#detailed-topic-interpretations",
+    "href": "06_Topics_Interpretation.html#detailed-topic-interpretations",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "Detailed Topic Interpretations",
+    "text": "Detailed Topic Interpretations\n\nInterpretations for k = 4\n\n\nLLM Interpretations for 4 Topics\n\n\n\n\nTopic\n\n\nLLM Label\n\n\nLLM Focus\n\n\nTop 15 Words Sent to LLM\n\n\n\n\n\n\n1\n\n\nParliamentary Procedure & Administration\n\n\nThis topic covers the formal parliamentary processes, legislative submissions, and administrative matters including railways, public accounts, and British colonial governance structures.\n\n\nsubmit, lay, last, railway, subject, public, trade, present, state, unite, session, may, parliament, attention, law, west, estimate, british, past, upon, consideration, measure, relate, account, service\n\n\n\n\n2\n\n\nSocial Policy & Community Welfare\n\n\nThis topic encompasses domestic social programs focused on health care, family support, job creation, and community building including Aboriginal affairs.\n\n\ncommunity, health, world, build, support, help, good, economy, family, child, job, care, opportunity, economic, can, create, strong, system, first, investment, action, strengthen, plan, time, aboriginal\n\n\n\n\n3\n\n\nInternational Affairs & Defense\n\n\nThis topic addresses Canada’s international relations, military affairs, trade agreements, and participation in global conferences and diplomatic initiatives.\n\n\nminister, war, house, unite, nation, force, trade, legislation, international, parliament, last, agreement, service, development, provision, consider, amendment, member, common, submit, world, continue, session, conference, measure\n\n\n\n\n4\n\n\nEconomic Development & Growth\n\n\nThis topic focuses on federal economic policy, including resource development, market growth, provincial-federal cooperation, and programs to stimulate economic development.\n\n\neconomic, development, program, federal, opportunity, legislation, improve, social, parliament, economy, world, international, can, minister, service, change, introduce, resource, increase, growth, public, encourage, market, provincial, good\n\n\n\n\n\n\nInterpretations for k = 8\n\n\nLLM Interpretations for 8 Topics\n\n\n\n\nTopic\n\n\nLLM Label\n\n\nLLM Focus\n\n\nTop 15 Words Sent to LLM\n\n\n\n\n\n\n1\n\n\nParliamentary Business & Trade\n\n\nThis topic represents formal parliamentary procedures, legislative sessions, and trade relations with emphasis on British Commonwealth connections and railway development.\n\n\nlast, submit, may, trade, public, state, session, unite, railway, attention, parliament, conference, present, result, subject, early, british, lay, country, upon, house, time, product, respect, regard\n\n\n\n\n2\n\n\nSocial Programs & Healthcare\n\n\nThis topic focuses on healthcare systems, community development, family support, and Aboriginal affairs within the broader context of economic and social investment.\n\n\nhealth, community, world, child, economy, opportunity, build, help, good, can, support, aboriginal, care, government, life, development, economic, strong, system, investment, need, improve, challenge, family, quality\n\n\n\n\n3\n\n\nWar & International Relations\n\n\nThis topic addresses wartime governance, military forces, international agreements, and peacekeeping efforts during periods of global conflict.\n\n\nwar, house, force, unite, nation, parliament, minister, provision, common, service, world, submit, member, trade, session, condition, agreement, last, present, peace, upon, may, consideration, necessary, international\n\n\n\n\n4\n\n\nJobs & Economic Policy\n\n\nThis topic centers on employment creation, business support, taxation, and economic security measures to strengthen industry and protect families.\n\n\njob, support, family, good, world, economic, build, community, legislation, help, protect, plan, business, introduce, create, economy, tax, trade, action, security, system, future, industry, time, strengthen\n\n\n\n\n5\n\n\nInfrastructure & Regional Development\n\n\nThis topic covers railway expansion, regional development in western and northern Canada, and public infrastructure projects requiring legislative consideration.\n\n\nlay, railway, submit, last, subject, public, west, law, present, trade, relate, parliament, past, measure, unite, north, now, session, consideration, state, several, estimate, upon, service, report\n\n\n\n\n6\n\n\nFederal-Provincial Coordination\n\n\nThis topic addresses federal-provincial relations, legislative amendments, international agreements, and coordinated program development across government levels.\n\n\ndevelopment, minister, legislation, amendment, nation, unite, international, house, consider, propose, provincial, trade, programme, assistance, approve, federal, continue, measure, place, increase, economic, agreement, last, service, force\n\n\n\n\n7\n\n\nIndigenous Affairs & Climate\n\n\nThis topic focuses on Indigenous communities, climate change action, pandemic response, and contemporary social challenges requiring government intervention.\n\n\ncommunity, build, support, help, economy, action, indigenous, good, include, first, change, job, create, health, world, care, pandemic, protect, family, time, safe, home, climate, invest, plan\n\n\n\n\n8\n\n\nEconomic Development Programs\n\n\nThis topic encompasses federal economic programs, social development initiatives, resource management, and legislative measures to promote growth and societal improvement.\n\n\neconomic, program, development, federal, social, opportunity, parliament, minister, improve, legislation, resource, change, can, society, service, world, economy, international, public, encourage, introduce, increase, one, growth, good"
+  },
+  {
+    "objectID": "06_Topics_Interpretation.html#conclusion",
+    "href": "06_Topics_Interpretation.html#conclusion",
+    "title": "LLM Interpretation of Topic Models",
+    "section": "Conclusion",
+    "text": "Conclusion\nNow that we have interpretations for our topics, we are ready to analyze the models’ gamma values—the proportion of each topic within an individual speech. In the final step, we will visualize how these topic proportions change over time, mapping the thematic shifts in Canada’s political discourse.\nNext Step: Topic Shift Analysis & Validation →"
+  }
+]
