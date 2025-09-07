@@ -4081,7 +4081,7 @@ border: 0;
  <span class="dropdown-text">LDA Topic Modeling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_topics_interpretation.html">
+    <a class="dropdown-item" href="./06_Topics_Interpretation.qmd">
  <span class="dropdown-text">LLM Topic Interpretation</span></a>
   </li>  
         <li>
@@ -4185,12 +4185,6 @@ border: 0;
   <div class="sidebar-item-container"> 
   <a href="./05_Topics_Extraction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">LDA Topic Extraction and Analysis</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./06_topics_interpretation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">LLM Interpretation of Topic Models</span></a>
   </div>
 </li>
       </ul>
@@ -4805,7 +4799,7 @@ Indigenous Affairs &amp; Climate
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/DoronF\.github\.io\/Thrown_Speechs\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

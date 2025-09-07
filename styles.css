@@ -1,0 +1,18 @@
+/* Force code blocks to use full available width */
+.cell-code pre code {
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Increase container width for code blocks */
+.cell-code {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* For numbered code lines specifically */
+.sourceCode pre {
+    max-width: calc(100vw - 100px) !important;
+    overflow-x: auto !important;
+}

@@ -1,4 +1,5 @@
 library(tidytext)
+library(tidyverse)
 
 #  Logging
 

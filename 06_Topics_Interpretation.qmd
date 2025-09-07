@@ -20,7 +20,7 @@ For this task, we selected Anthropic's Claude model, which has a reputation for 
 
 First, we load the necessary libraries and data.
 
-```{r setup, message=FALSE, warning=FALSE, echo = TRUE}
+```{r setup, message=FALSE, warning=FALSE}
 # Seed
 set.seed(1867)
 
@@ -38,7 +38,17 @@ library(readr)
 library(kableExtra)
 
 # Load project-specific functions
-source("R/functions.R")
+# Get more detailed error
+tryCatch(
+  {
+    source("R/functions.R")
+  },
+  error = function(e) {
+    cat("Detailed error:\n")
+    cat("Message:", e$message, "\n")
+    cat("Call:", deparse(e$call), "\n")
+  }
+)
 
 # Load trained models and corpus metadata
 lda_models <- readRDS("output/models/lda_models.rds")

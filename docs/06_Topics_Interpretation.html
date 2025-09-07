@@ -3892,7 +3892,7 @@ vertical-align: -.125em;
  <span class="dropdown-text">LDA Topic Modeling</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./06_topics_interpretation.html">
+    <a class="dropdown-item" href="./06_Topics_Interpretation.qmd">
  <span class="dropdown-text">LLM Topic Interpretation</span></a>
   </li>  
         <li>
@@ -3919,7 +3919,7 @@ vertical-align: -.125em;
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04_Boilerplate_Identification.html">Natural Language Processing</a></li><li class="breadcrumb-item"><a href="./06_topics_interpretation.html">LLM Interpretation of Topic Models</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">LLM Interpretation of Topic Models</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -3998,12 +3998,6 @@ vertical-align: -.125em;
  <span class="menu-text">LDA Topic Extraction and Analysis</span></a>
   </div>
 </li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./06_topics_interpretation.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">LLM Interpretation of Topic Models</span></a>
-  </div>
-</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -4052,7 +4046,7 @@ vertical-align: -.125em;
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04_Boilerplate_Identification.html">Natural Language Processing</a></li><li class="breadcrumb-item"><a href="./06_topics_interpretation.html">LLM Interpretation of Topic Models</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">LLM Interpretation of Topic Models</h1>
 </div>
@@ -4551,7 +4545,7 @@ economic, program, development, federal, social, opportunity, parliament, minist
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp("https:\/\/DoronF\.github\.io\/Thrown_Speechs\/");
+        var filterRegex = new RegExp('/' + window.location.host + '/');
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

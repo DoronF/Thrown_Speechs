@@ -783,4 +783,4 @@ The analysis reveals a clear trade-off between topic quality and temporal balanc
 
 Since they have different things to tell us about the texts, we choose **both**.
 
-**Next Step:** [LLM Interpretation of Topic Models →](06_Topics_interpretation.qmd)
+**Next Step:** [LLM Interpretation of Topic Models →](06_Topics_Interpretation.qmd)
