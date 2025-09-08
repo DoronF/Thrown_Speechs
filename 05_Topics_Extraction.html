@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Doron Feingold">
-<meta name="dcterms.date" content="2025-09-07">
+<meta name="dcterms.date" content="2025-09-08">
 
 <title>LDA Topic Extraction and Analysis – Statistical Text Mining of Standardized Political Documents</title>
 <style>
@@ -4069,7 +4069,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 7, 2025</p>
+      <p class="date">September 8, 2025</p>
     </div>
   </div>
   
@@ -5084,10 +5084,10 @@ Cumulative Proportion  0.8549 1.0000</code></pre>
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>The analysis reveals a clear trade-off between topic quality and temporal balance.</p>
 <ul>
-<li><p><strong>For Highest Topic Quality:</strong> The <strong>k=4</strong> model is the undisputed winner. It produces the most distinct, dominant, and efficient topics. If the goal is to identify the strongest, most interpretable themes in the corpus, <strong>k=4</strong> is the best choice.</p></li>
-<li><p><strong>For Best Temporal Balance:</strong> The <strong>k=8</strong> model offers the most even distribution of topics across historical eras (Pre-War, Mid-Century, Modern Era) and demonstrates high stability in topic prominence over time. If the goal is to analyze how different themes evolve and ensure all periods are represented, <strong>k=8</strong> is the superior option.</p></li>
+<li><p><strong>For Highest Topic Quality</strong>: The k=4 model is the top performer, with the highest average quality score (0.696), efficiency rate (75%), and three high-quality topics. It produces the most distinct, dominant, and interpretable themes in the corpus. Despite its lower PCA score (avg_pc1 = -1.989), which suggests less consistent dominance and exclusivity across topics, this is likely due to its high variance, where some topics are exceptionally strong while others are weaker. For researchers prioritizing clear and impactful themes, k=4 is the best choice.</p></li>
+<li><p><strong>For Best Temporal Balance</strong>: The k=8 model excels with the most even topic distribution across historical eras (std_dev = 0.072, evenness_rank = 1.0) and stable prominence over time (no dead topics). It ensures all periods (Pre-War, Mid-Century, Modern Era) are well-represented, making it ideal for analyzing thematic evolution across time.</p></li>
 </ul>
-<p>Since they have different things to tell us about the texts, we choose <strong>both</strong>.</p>
+<p>To leverage both strengths, we recommend using k=4 and k=8 in parallel analyses. For example, apply the k=4 model to extract prominent themes for in-depth qualitative interpretation, and use the k=8 model to study temporal trends and ensure balanced representation across eras. While other models like k=12 show strong PCA performance (avg_pc1 = 0.629), they have lower efficiency (8.3%) and more low-quality topics, making k=4 and k=8 the optimal choices for their respective goals.</p>
 <p><strong>Next Step:</strong> <a href="./06_Topics_Interpretation.html">LLM Interpretation of Topic Models →</a></p>
 
 
